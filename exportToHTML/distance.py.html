@@ -1,0 +1,54 @@
+<html>
+<head>
+<title>distance.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #0033b3;}
+.s1 { color: #080808;}
+.s2 { color: #1750eb;}
+.s3 { color: #008080; font-weight: bold;}
+.ln { color: #adadad; font-weight: normal; font-style: normal; }
+</style>
+</head>
+<body bgcolor="#ffffff">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+distance.py</font>
+</center></td></tr></table>
+<pre><a name="l1"><span class="ln">1    </span></a><span class="s0">import </span><span class="s1">numpy </span><span class="s0">as </span><span class="s1">np</span>
+<a name="l2"><span class="ln">2    </span></a>
+<a name="l3"><span class="ln">3    </span></a><span class="s0">def </span><span class="s1">findCosineDistance(source_representation, test_representation):</span>
+<a name="l4"><span class="ln">4    </span></a>    <span class="s1">a = np.matmul(np.transpose(source_representation), test_representation)</span>
+<a name="l5"><span class="ln">5    </span></a>    <span class="s1">b = np.sum(np.multiply(source_representation, source_representation))</span>
+<a name="l6"><span class="ln">6    </span></a>    <span class="s1">c = np.sum(np.multiply(test_representation, test_representation))</span>
+<a name="l7"><span class="ln">7    </span></a>    <span class="s0">return </span><span class="s2">1 </span><span class="s1">- (a / (np.sqrt(b) * np.sqrt(c)))</span>
+<a name="l8"><span class="ln">8    </span></a>
+<a name="l9"><span class="ln">9    </span></a><span class="s0">def </span><span class="s1">findEuclideanDistance(source_representation, test_representation):</span>
+<a name="l10"><span class="ln">10   </span></a>    <span class="s1">euclidean_distance = source_representation - test_representation</span>
+<a name="l11"><span class="ln">11   </span></a>    <span class="s1">euclidean_distance = np.sum(np.multiply(euclidean_distance, euclidean_distance))</span>
+<a name="l12"><span class="ln">12   </span></a>    <span class="s1">euclidean_distance = np.sqrt(euclidean_distance)</span>
+<a name="l13"><span class="ln">13   </span></a>    <span class="s0">return </span><span class="s1">euclidean_distance</span>
+<a name="l14"><span class="ln">14   </span></a>
+<a name="l15"><span class="ln">15   </span></a><span class="s0">def </span><span class="s1">l2_normalize(x):</span>
+<a name="l16"><span class="ln">16   </span></a>    <span class="s0">return </span><span class="s1">x / np.sqrt(np.sum(np.multiply(x, x)))	</span>
+<a name="l17"><span class="ln">17   </span></a>
+<a name="l18"><span class="ln">18   </span></a><span class="s0">def </span><span class="s1">findThreshold(model_name, distance_metric):</span>
+<a name="l19"><span class="ln">19   </span></a>	
+<a name="l20"><span class="ln">20   </span></a>	<span class="s1">base_threshold = {</span><span class="s3">'cosine'</span><span class="s1">: </span><span class="s2">0.40</span><span class="s1">, </span><span class="s3">'euclidean'</span><span class="s1">: </span><span class="s2">0.55</span><span class="s1">, </span><span class="s3">'euclidean_l2'</span><span class="s1">: </span><span class="s2">0.75</span><span class="s1">}</span>
+<a name="l21"><span class="ln">21   </span></a>	
+<a name="l22"><span class="ln">22   </span></a>	<span class="s1">thresholds = {</span>
+<a name="l23"><span class="ln">23   </span></a>		<span class="s3">'VGG-Face'</span><span class="s1">: {</span><span class="s3">'cosine'</span><span class="s1">: </span><span class="s2">0.40</span><span class="s1">, </span><span class="s3">'euclidean'</span><span class="s1">: </span><span class="s2">0.55</span><span class="s1">, </span><span class="s3">'euclidean_l2'</span><span class="s1">: </span><span class="s2">0.75</span><span class="s1">},</span>
+<a name="l24"><span class="ln">24   </span></a>		<span class="s3">'OpenFace'</span><span class="s1">: {</span><span class="s3">'cosine'</span><span class="s1">: </span><span class="s2">0.10</span><span class="s1">, </span><span class="s3">'euclidean'</span><span class="s1">: </span><span class="s2">0.55</span><span class="s1">, </span><span class="s3">'euclidean_l2'</span><span class="s1">: </span><span class="s2">0.55</span><span class="s1">},</span>
+<a name="l25"><span class="ln">25   </span></a>		<span class="s3">'Facenet'</span><span class="s1">:  {</span><span class="s3">'cosine'</span><span class="s1">: </span><span class="s2">0.40</span><span class="s1">, </span><span class="s3">'euclidean'</span><span class="s1">: </span><span class="s2">10</span><span class="s1">, </span><span class="s3">'euclidean_l2'</span><span class="s1">: </span><span class="s2">0.80</span><span class="s1">},</span>
+<a name="l26"><span class="ln">26   </span></a>		<span class="s3">'DeepFace'</span><span class="s1">: {</span><span class="s3">'cosine'</span><span class="s1">: </span><span class="s2">0.23</span><span class="s1">, </span><span class="s3">'euclidean'</span><span class="s1">: </span><span class="s2">64</span><span class="s1">, </span><span class="s3">'euclidean_l2'</span><span class="s1">: </span><span class="s2">0.64</span><span class="s1">},</span>
+<a name="l27"><span class="ln">27   </span></a>		<span class="s3">'DeepID'</span><span class="s1">: 	{</span><span class="s3">'cosine'</span><span class="s1">: </span><span class="s2">0.015</span><span class="s1">, </span><span class="s3">'euclidean'</span><span class="s1">: </span><span class="s2">45</span><span class="s1">, </span><span class="s3">'euclidean_l2'</span><span class="s1">: </span><span class="s2">0.17</span><span class="s1">},</span>
+<a name="l28"><span class="ln">28   </span></a>		<span class="s3">'Dlib'</span><span class="s1">: 	{</span><span class="s3">'cosine'</span><span class="s1">: </span><span class="s2">0.07</span><span class="s1">, </span><span class="s3">'euclidean'</span><span class="s1">: </span><span class="s2">0.6</span><span class="s1">, </span><span class="s3">'euclidean_l2'</span><span class="s1">: </span><span class="s2">0.6</span><span class="s1">},</span>
+<a name="l29"><span class="ln">29   </span></a>		<span class="s3">'ArcFace'</span><span class="s1">:  {</span><span class="s3">'cosine'</span><span class="s1">: </span><span class="s2">0.6871912959056619</span><span class="s1">, </span><span class="s3">'euclidean'</span><span class="s1">: </span><span class="s2">4.1591468986978075</span><span class="s1">, </span><span class="s3">'euclidean_l2'</span><span class="s1">: </span><span class="s2">1.1315718048269017</span><span class="s1">}</span>
+<a name="l30"><span class="ln">30   </span></a>		<span class="s1">}</span>
+<a name="l31"><span class="ln">31   </span></a>
+<a name="l32"><span class="ln">32   </span></a>	<span class="s1">threshold = thresholds.get(model_name, base_threshold).get(distance_metric, </span><span class="s2">0.4</span><span class="s1">)</span>
+<a name="l33"><span class="ln">33   </span></a>	
+<a name="l34"><span class="ln">34   </span></a>	<span class="s0">return </span><span class="s1">threshold</span></pre>
+</body>
+</html>

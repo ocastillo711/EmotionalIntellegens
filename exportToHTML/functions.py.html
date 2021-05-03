@@ -1,0 +1,508 @@
+<html>
+<head>
+<title>functions.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #0033b3;}
+.s1 { color: #080808;}
+.s2 { color: #8c8c8c; font-style: italic;}
+.s3 { color: #008080; font-weight: bold;}
+.s4 { color: #1750eb;}
+.ln { color: #adadad; font-weight: normal; font-style: normal; }
+</style>
+</head>
+<body bgcolor="#ffffff">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+functions.py</font>
+</center></td></tr></table>
+<pre><a name="l1"><span class="ln">1    </span></a><span class="s0">import </span><span class="s1">os</span>
+<a name="l2"><span class="ln">2    </span></a><span class="s0">import </span><span class="s1">numpy </span><span class="s0">as </span><span class="s1">np</span>
+<a name="l3"><span class="ln">3    </span></a><span class="s0">import </span><span class="s1">pandas </span><span class="s0">as </span><span class="s1">pd</span>
+<a name="l4"><span class="ln">4    </span></a><span class="s0">import </span><span class="s1">cv2</span>
+<a name="l5"><span class="ln">5    </span></a><span class="s0">from </span><span class="s1">pathlib </span><span class="s0">import </span><span class="s1">Path</span>
+<a name="l6"><span class="ln">6    </span></a><span class="s0">import </span><span class="s1">gdown</span>
+<a name="l7"><span class="ln">7    </span></a><span class="s0">import </span><span class="s1">hashlib</span>
+<a name="l8"><span class="ln">8    </span></a><span class="s0">import </span><span class="s1">math</span>
+<a name="l9"><span class="ln">9    </span></a><span class="s0">from </span><span class="s1">PIL </span><span class="s0">import </span><span class="s1">Image</span>
+<a name="l10"><span class="ln">10   </span></a><span class="s0">import </span><span class="s1">copy</span>
+<a name="l11"><span class="ln">11   </span></a><span class="s0">import </span><span class="s1">base64</span>
+<a name="l12"><span class="ln">12   </span></a><span class="s0">import </span><span class="s1">multiprocessing</span>
+<a name="l13"><span class="ln">13   </span></a><span class="s0">import </span><span class="s1">subprocess</span>
+<a name="l14"><span class="ln">14   </span></a><span class="s0">import </span><span class="s1">bz2</span>
+<a name="l15"><span class="ln">15   </span></a><span class="s0">from </span><span class="s1">deepface.commons </span><span class="s0">import </span><span class="s1">distance</span>
+<a name="l16"><span class="ln">16   </span></a><span class="s0">from </span><span class="s1">mtcnn </span><span class="s0">import </span><span class="s1">MTCNN </span><span class="s2">#0.1.0</span>
+<a name="l17"><span class="ln">17   </span></a>
+<a name="l18"><span class="ln">18   </span></a><span class="s0">import </span><span class="s1">tensorflow </span><span class="s0">as </span><span class="s1">tf</span>
+<a name="l19"><span class="ln">19   </span></a><span class="s1">tf_version = int(tf.__version__.split(</span><span class="s3">&quot;.&quot;</span><span class="s1">)[</span><span class="s4">0</span><span class="s1">])</span>
+<a name="l20"><span class="ln">20   </span></a>
+<a name="l21"><span class="ln">21   </span></a><span class="s0">if </span><span class="s1">tf_version == </span><span class="s4">1</span><span class="s1">:</span>
+<a name="l22"><span class="ln">22   </span></a>	<span class="s0">import </span><span class="s1">keras</span>
+<a name="l23"><span class="ln">23   </span></a>	<span class="s0">from </span><span class="s1">keras.preprocessing.image </span><span class="s0">import </span><span class="s1">load_img, save_img, img_to_array</span>
+<a name="l24"><span class="ln">24   </span></a>	<span class="s0">from </span><span class="s1">keras.applications.imagenet_utils </span><span class="s0">import </span><span class="s1">preprocess_input</span>
+<a name="l25"><span class="ln">25   </span></a>	<span class="s0">from </span><span class="s1">keras.preprocessing </span><span class="s0">import </span><span class="s1">image</span>
+<a name="l26"><span class="ln">26   </span></a><span class="s0">elif </span><span class="s1">tf_version == </span><span class="s4">2</span><span class="s1">:</span>
+<a name="l27"><span class="ln">27   </span></a>	<span class="s0">from </span><span class="s1">tensorflow </span><span class="s0">import </span><span class="s1">keras</span>
+<a name="l28"><span class="ln">28   </span></a>	<span class="s0">from </span><span class="s1">tensorflow.keras.preprocessing.image </span><span class="s0">import </span><span class="s1">load_img, save_img, img_to_array</span>
+<a name="l29"><span class="ln">29   </span></a>	<span class="s0">from </span><span class="s1">tensorflow.keras.applications.imagenet_utils </span><span class="s0">import </span><span class="s1">preprocess_input</span>
+<a name="l30"><span class="ln">30   </span></a>	<span class="s0">from </span><span class="s1">tensorflow.keras.preprocessing </span><span class="s0">import </span><span class="s1">image</span>
+<a name="l31"><span class="ln">31   </span></a>
+<a name="l32"><span class="ln">32   </span></a><span class="s2">#--------------------------------------------------</span>
+<a name="l33"><span class="ln">33   </span></a>
+<a name="l34"><span class="ln">34   </span></a><span class="s0">def </span><span class="s1">initialize_input(img1_path, img2_path = </span><span class="s0">None</span><span class="s1">):</span>
+<a name="l35"><span class="ln">35   </span></a>	
+<a name="l36"><span class="ln">36   </span></a>	<span class="s0">if </span><span class="s1">type(img1_path) == list:</span>
+<a name="l37"><span class="ln">37   </span></a>		<span class="s1">bulkProcess = </span><span class="s0">True</span>
+<a name="l38"><span class="ln">38   </span></a>		<span class="s1">img_list = img1_path.copy()</span>
+<a name="l39"><span class="ln">39   </span></a>	<span class="s0">else</span><span class="s1">:</span>
+<a name="l40"><span class="ln">40   </span></a>		<span class="s1">bulkProcess = </span><span class="s0">False</span>
+<a name="l41"><span class="ln">41   </span></a>		
+<a name="l42"><span class="ln">42   </span></a>		<span class="s0">if </span><span class="s1">(</span>
+<a name="l43"><span class="ln">43   </span></a>			<span class="s1">(type(img2_path) == str </span><span class="s0">and </span><span class="s1">img2_path != </span><span class="s0">None</span><span class="s1">) </span><span class="s2">#exact image path, base64 image</span>
+<a name="l44"><span class="ln">44   </span></a>			<span class="s0">or </span><span class="s1">(isinstance(img2_path, np.ndarray) </span><span class="s0">and </span><span class="s1">img2_path.any()) </span><span class="s2">#numpy array</span>
+<a name="l45"><span class="ln">45   </span></a>		<span class="s1">):</span>
+<a name="l46"><span class="ln">46   </span></a>			<span class="s1">img_list = [[img1_path, img2_path]]</span>
+<a name="l47"><span class="ln">47   </span></a>		<span class="s0">else</span><span class="s1">: </span><span class="s2">#analyze function passes just img1_path</span>
+<a name="l48"><span class="ln">48   </span></a>			<span class="s1">img_list = [img1_path]</span>
+<a name="l49"><span class="ln">49   </span></a>	
+<a name="l50"><span class="ln">50   </span></a>	<span class="s0">return </span><span class="s1">img_list, bulkProcess</span>
+<a name="l51"><span class="ln">51   </span></a>
+<a name="l52"><span class="ln">52   </span></a><span class="s0">def </span><span class="s1">initialize_detector(detector_backend):</span>
+<a name="l53"><span class="ln">53   </span></a>	
+<a name="l54"><span class="ln">54   </span></a>	<span class="s0">global </span><span class="s1">face_detector</span>
+<a name="l55"><span class="ln">55   </span></a>	
+<a name="l56"><span class="ln">56   </span></a>	<span class="s1">home = str(Path.home())</span>
+<a name="l57"><span class="ln">57   </span></a>	
+<a name="l58"><span class="ln">58   </span></a>	<span class="s2">#eye detector is common for opencv and ssd</span>
+<a name="l59"><span class="ln">59   </span></a>	<span class="s0">if </span><span class="s1">detector_backend == </span><span class="s3">'opencv' </span><span class="s0">or </span><span class="s1">detector_backend == </span><span class="s3">'ssd'</span><span class="s1">:</span>
+<a name="l60"><span class="ln">60   </span></a>		<span class="s1">opencv_path = get_opencv_path()</span>
+<a name="l61"><span class="ln">61   </span></a>		<span class="s1">eye_detector_path = opencv_path+</span><span class="s3">&quot;haarcascade_eye.xml&quot;</span>
+<a name="l62"><span class="ln">62   </span></a>		
+<a name="l63"><span class="ln">63   </span></a>		<span class="s0">if </span><span class="s1">os.path.isfile(eye_detector_path) != </span><span class="s0">True</span><span class="s1">:</span>
+<a name="l64"><span class="ln">64   </span></a>			<span class="s0">raise </span><span class="s1">ValueError(</span><span class="s3">&quot;Confirm that opencv is installed on your environment! Expected path &quot;</span><span class="s1">,eye_detector_path,</span><span class="s3">&quot; violated.&quot;</span><span class="s1">)</span>
+<a name="l65"><span class="ln">65   </span></a>		
+<a name="l66"><span class="ln">66   </span></a>		<span class="s0">global </span><span class="s1">eye_detector</span>
+<a name="l67"><span class="ln">67   </span></a>		<span class="s1">eye_detector = cv2.CascadeClassifier(eye_detector_path)</span>
+<a name="l68"><span class="ln">68   </span></a>		
+<a name="l69"><span class="ln">69   </span></a>	<span class="s2">#------------------------------</span>
+<a name="l70"><span class="ln">70   </span></a>	<span class="s2">#face detectors</span>
+<a name="l71"><span class="ln">71   </span></a>	<span class="s0">if </span><span class="s1">detector_backend == </span><span class="s3">'opencv'</span><span class="s1">:</span>
+<a name="l72"><span class="ln">72   </span></a>		<span class="s1">opencv_path = get_opencv_path()</span>
+<a name="l73"><span class="ln">73   </span></a>		<span class="s1">face_detector_path = opencv_path+</span><span class="s3">&quot;haarcascade_frontalface_default.xml&quot;</span>
+<a name="l74"><span class="ln">74   </span></a>		
+<a name="l75"><span class="ln">75   </span></a>		<span class="s0">if </span><span class="s1">os.path.isfile(face_detector_path) != </span><span class="s0">True</span><span class="s1">:</span>
+<a name="l76"><span class="ln">76   </span></a>			<span class="s0">raise </span><span class="s1">ValueError(</span><span class="s3">&quot;Confirm that opencv is installed on your environment! Expected path &quot;</span><span class="s1">,face_detector_path,</span><span class="s3">&quot; violated.&quot;</span><span class="s1">)</span>
+<a name="l77"><span class="ln">77   </span></a>		
+<a name="l78"><span class="ln">78   </span></a>		<span class="s1">face_detector = cv2.CascadeClassifier(face_detector_path)</span>
+<a name="l79"><span class="ln">79   </span></a>	
+<a name="l80"><span class="ln">80   </span></a>	<span class="s0">elif </span><span class="s1">detector_backend == </span><span class="s3">'ssd'</span><span class="s1">:</span>
+<a name="l81"><span class="ln">81   </span></a>	
+<a name="l82"><span class="ln">82   </span></a>		<span class="s2">#check required ssd model exists in the home/.deepface/weights folder</span>
+<a name="l83"><span class="ln">83   </span></a>		
+<a name="l84"><span class="ln">84   </span></a>		<span class="s2">#model structure</span>
+<a name="l85"><span class="ln">85   </span></a>		<span class="s0">if </span><span class="s1">os.path.isfile(home+</span><span class="s3">'/.deepface/weights/deploy.prototxt'</span><span class="s1">) != </span><span class="s0">True</span><span class="s1">:</span>
+<a name="l86"><span class="ln">86   </span></a>			
+<a name="l87"><span class="ln">87   </span></a>			<span class="s1">print(</span><span class="s3">&quot;deploy.prototxt will be downloaded...&quot;</span><span class="s1">)</span>
+<a name="l88"><span class="ln">88   </span></a>			
+<a name="l89"><span class="ln">89   </span></a>			<span class="s1">url = </span><span class="s3">&quot;https://github.com/opencv/opencv/raw/3.4.0/samples/dnn/face_detector/deploy.prototxt&quot;</span>
+<a name="l90"><span class="ln">90   </span></a>			
+<a name="l91"><span class="ln">91   </span></a>			<span class="s1">output = home+</span><span class="s3">'/.deepface/weights/deploy.prototxt'</span>
+<a name="l92"><span class="ln">92   </span></a>			
+<a name="l93"><span class="ln">93   </span></a>			<span class="s1">gdown.download(url, output, quiet=</span><span class="s0">False</span><span class="s1">)</span>
+<a name="l94"><span class="ln">94   </span></a>		
+<a name="l95"><span class="ln">95   </span></a>		<span class="s2">#pre-trained weights</span>
+<a name="l96"><span class="ln">96   </span></a>		<span class="s0">if </span><span class="s1">os.path.isfile(home+</span><span class="s3">'/.deepface/weights/res10_300x300_ssd_iter_140000.caffemodel'</span><span class="s1">) != </span><span class="s0">True</span><span class="s1">:</span>
+<a name="l97"><span class="ln">97   </span></a>			
+<a name="l98"><span class="ln">98   </span></a>			<span class="s1">print(</span><span class="s3">&quot;res10_300x300_ssd_iter_140000.caffemodel will be downloaded...&quot;</span><span class="s1">)</span>
+<a name="l99"><span class="ln">99   </span></a>			
+<a name="l100"><span class="ln">100  </span></a>			<span class="s1">url = </span><span class="s3">&quot;https://github.com/opencv/opencv_3rdparty/raw/dnn_samples_face_detector_20170830/res10_300x300_ssd_iter_140000.caffemodel&quot;</span>
+<a name="l101"><span class="ln">101  </span></a>			
+<a name="l102"><span class="ln">102  </span></a>			<span class="s1">output = home+</span><span class="s3">'/.deepface/weights/res10_300x300_ssd_iter_140000.caffemodel'</span>
+<a name="l103"><span class="ln">103  </span></a>			
+<a name="l104"><span class="ln">104  </span></a>			<span class="s1">gdown.download(url, output, quiet=</span><span class="s0">False</span><span class="s1">)</span>
+<a name="l105"><span class="ln">105  </span></a>		
+<a name="l106"><span class="ln">106  </span></a>		<span class="s1">face_detector = cv2.dnn.readNetFromCaffe(</span>
+<a name="l107"><span class="ln">107  </span></a>			<span class="s1">home+</span><span class="s3">&quot;/.deepface/weights/deploy.prototxt&quot;</span><span class="s1">, </span>
+<a name="l108"><span class="ln">108  </span></a>			<span class="s1">home+</span><span class="s3">&quot;/.deepface/weights/res10_300x300_ssd_iter_140000.caffemodel&quot;</span>
+<a name="l109"><span class="ln">109  </span></a>		<span class="s1">)</span>
+<a name="l110"><span class="ln">110  </span></a>		
+<a name="l111"><span class="ln">111  </span></a>	<span class="s0">elif </span><span class="s1">detector_backend == </span><span class="s3">'dlib'</span><span class="s1">:</span>
+<a name="l112"><span class="ln">112  </span></a>		<span class="s0">import </span><span class="s1">dlib </span><span class="s2">#this is not a must library within deepface. that's why, I didn't put this import to a global level. version: 19.20.0</span>
+<a name="l113"><span class="ln">113  </span></a>		
+<a name="l114"><span class="ln">114  </span></a>		<span class="s0">global </span><span class="s1">sp</span>
+<a name="l115"><span class="ln">115  </span></a>		
+<a name="l116"><span class="ln">116  </span></a>		<span class="s1">face_detector = dlib.get_frontal_face_detector()</span>
+<a name="l117"><span class="ln">117  </span></a>		
+<a name="l118"><span class="ln">118  </span></a>		<span class="s2">#check required file exists in the home/.deepface/weights folder</span>
+<a name="l119"><span class="ln">119  </span></a>		<span class="s0">if </span><span class="s1">os.path.isfile(home+</span><span class="s3">'/.deepface/weights/shape_predictor_5_face_landmarks.dat'</span><span class="s1">) != </span><span class="s0">True</span><span class="s1">:</span>
+<a name="l120"><span class="ln">120  </span></a>			
+<a name="l121"><span class="ln">121  </span></a>			<span class="s1">print(</span><span class="s3">&quot;shape_predictor_5_face_landmarks.dat.bz2 is going to be downloaded&quot;</span><span class="s1">) </span>
+<a name="l122"><span class="ln">122  </span></a>			
+<a name="l123"><span class="ln">123  </span></a>			<span class="s1">url = </span><span class="s3">&quot;http://dlib.net/files/shape_predictor_5_face_landmarks.dat.bz2&quot;</span>
+<a name="l124"><span class="ln">124  </span></a>			<span class="s1">output = home+</span><span class="s3">'/.deepface/weights/'</span><span class="s1">+url.split(</span><span class="s3">&quot;/&quot;</span><span class="s1">)[-</span><span class="s4">1</span><span class="s1">]</span>
+<a name="l125"><span class="ln">125  </span></a>			
+<a name="l126"><span class="ln">126  </span></a>			<span class="s1">gdown.download(url, output, quiet=</span><span class="s0">False</span><span class="s1">)</span>
+<a name="l127"><span class="ln">127  </span></a>			
+<a name="l128"><span class="ln">128  </span></a>			<span class="s1">zipfile = bz2.BZ2File(output)</span>
+<a name="l129"><span class="ln">129  </span></a>			<span class="s1">data = zipfile.read()</span>
+<a name="l130"><span class="ln">130  </span></a>			<span class="s1">newfilepath = output[:-</span><span class="s4">4</span><span class="s1">] </span><span class="s2">#discard .bz2 extension</span>
+<a name="l131"><span class="ln">131  </span></a>			<span class="s1">open(newfilepath, </span><span class="s3">'wb'</span><span class="s1">).write(data)</span>
+<a name="l132"><span class="ln">132  </span></a>		
+<a name="l133"><span class="ln">133  </span></a>		<span class="s1">sp = dlib.shape_predictor(home+</span><span class="s3">&quot;/.deepface/weights/shape_predictor_5_face_landmarks.dat&quot;</span><span class="s1">)</span>
+<a name="l134"><span class="ln">134  </span></a>		
+<a name="l135"><span class="ln">135  </span></a>	<span class="s0">elif </span><span class="s1">detector_backend == </span><span class="s3">'mtcnn'</span><span class="s1">:</span>
+<a name="l136"><span class="ln">136  </span></a>		<span class="s1">face_detector = MTCNN()</span>
+<a name="l137"><span class="ln">137  </span></a>
+<a name="l138"><span class="ln">138  </span></a><span class="s0">def </span><span class="s1">initializeFolder():</span>
+<a name="l139"><span class="ln">139  </span></a>	
+<a name="l140"><span class="ln">140  </span></a>	<span class="s1">home = str(Path.home())</span>
+<a name="l141"><span class="ln">141  </span></a>	
+<a name="l142"><span class="ln">142  </span></a>	<span class="s0">if not </span><span class="s1">os.path.exists(home+</span><span class="s3">&quot;/.deepface&quot;</span><span class="s1">):</span>
+<a name="l143"><span class="ln">143  </span></a>		<span class="s1">os.mkdir(home+</span><span class="s3">&quot;/.deepface&quot;</span><span class="s1">)</span>
+<a name="l144"><span class="ln">144  </span></a>		<span class="s1">print(</span><span class="s3">&quot;Directory &quot;</span><span class="s1">,home,</span><span class="s3">&quot;/.deepface created&quot;</span><span class="s1">)</span>
+<a name="l145"><span class="ln">145  </span></a>	
+<a name="l146"><span class="ln">146  </span></a>	<span class="s0">if not </span><span class="s1">os.path.exists(home+</span><span class="s3">&quot;/.deepface/weights&quot;</span><span class="s1">):</span>
+<a name="l147"><span class="ln">147  </span></a>		<span class="s1">os.mkdir(home+</span><span class="s3">&quot;/.deepface/weights&quot;</span><span class="s1">)</span>
+<a name="l148"><span class="ln">148  </span></a>		<span class="s1">print(</span><span class="s3">&quot;Directory &quot;</span><span class="s1">,home,</span><span class="s3">&quot;/.deepface/weights created&quot;</span><span class="s1">)</span>
+<a name="l149"><span class="ln">149  </span></a>
+<a name="l150"><span class="ln">150  </span></a><span class="s0">def </span><span class="s1">loadBase64Img(uri):</span>
+<a name="l151"><span class="ln">151  </span></a>   <span class="s1">encoded_data = uri.split(</span><span class="s3">','</span><span class="s1">)[</span><span class="s4">1</span><span class="s1">]</span>
+<a name="l152"><span class="ln">152  </span></a>   <span class="s1">nparr = np.fromstring(base64.b64decode(encoded_data), np.uint8)</span>
+<a name="l153"><span class="ln">153  </span></a>   <span class="s1">img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)</span>
+<a name="l154"><span class="ln">154  </span></a>   <span class="s0">return </span><span class="s1">img</span>
+<a name="l155"><span class="ln">155  </span></a>
+<a name="l156"><span class="ln">156  </span></a><span class="s0">def </span><span class="s1">get_opencv_path():</span>
+<a name="l157"><span class="ln">157  </span></a>	<span class="s1">opencv_home = cv2.__file__</span>
+<a name="l158"><span class="ln">158  </span></a>	<span class="s1">folders = opencv_home.split(os.path.sep)[</span><span class="s4">0</span><span class="s1">:-</span><span class="s4">1</span><span class="s1">]</span>
+<a name="l159"><span class="ln">159  </span></a>	
+<a name="l160"><span class="ln">160  </span></a>	<span class="s1">path = folders[</span><span class="s4">0</span><span class="s1">]</span>
+<a name="l161"><span class="ln">161  </span></a>	<span class="s0">for </span><span class="s1">folder </span><span class="s0">in </span><span class="s1">folders[</span><span class="s4">1</span><span class="s1">:]:</span>
+<a name="l162"><span class="ln">162  </span></a>		<span class="s1">path = path + </span><span class="s3">&quot;/&quot; </span><span class="s1">+ folder</span>
+<a name="l163"><span class="ln">163  </span></a>	
+<a name="l164"><span class="ln">164  </span></a>	<span class="s0">return </span><span class="s1">path+</span><span class="s3">&quot;/data/&quot;</span>
+<a name="l165"><span class="ln">165  </span></a>
+<a name="l166"><span class="ln">166  </span></a><span class="s0">def </span><span class="s1">load_image(img):</span>
+<a name="l167"><span class="ln">167  </span></a>	
+<a name="l168"><span class="ln">168  </span></a>	<span class="s1">exact_image = </span><span class="s0">False</span>
+<a name="l169"><span class="ln">169  </span></a>	<span class="s0">if </span><span class="s1">type(img).__module__ == np.__name__:</span>
+<a name="l170"><span class="ln">170  </span></a>		<span class="s1">exact_image = </span><span class="s0">True</span>
+<a name="l171"><span class="ln">171  </span></a>	
+<a name="l172"><span class="ln">172  </span></a>	<span class="s1">base64_img = </span><span class="s0">False</span>
+<a name="l173"><span class="ln">173  </span></a>	<span class="s0">if </span><span class="s1">len(img) &gt; </span><span class="s4">11 </span><span class="s0">and </span><span class="s1">img[</span><span class="s4">0</span><span class="s1">:</span><span class="s4">11</span><span class="s1">] == </span><span class="s3">&quot;data:image/&quot;</span><span class="s1">:</span>
+<a name="l174"><span class="ln">174  </span></a>		<span class="s1">base64_img = </span><span class="s0">True</span>
+<a name="l175"><span class="ln">175  </span></a>	
+<a name="l176"><span class="ln">176  </span></a>	<span class="s2">#---------------------------</span>
+<a name="l177"><span class="ln">177  </span></a>	
+<a name="l178"><span class="ln">178  </span></a>	<span class="s0">if </span><span class="s1">base64_img == </span><span class="s0">True</span><span class="s1">:</span>
+<a name="l179"><span class="ln">179  </span></a>		<span class="s1">img = loadBase64Img(img)</span>
+<a name="l180"><span class="ln">180  </span></a>		
+<a name="l181"><span class="ln">181  </span></a>	<span class="s0">elif </span><span class="s1">exact_image != </span><span class="s0">True</span><span class="s1">: </span><span class="s2">#image path passed as input</span>
+<a name="l182"><span class="ln">182  </span></a>		<span class="s0">if </span><span class="s1">os.path.isfile(img) != </span><span class="s0">True</span><span class="s1">:</span>
+<a name="l183"><span class="ln">183  </span></a>			<span class="s0">raise </span><span class="s1">ValueError(</span><span class="s3">&quot;Confirm that &quot;</span><span class="s1">,img,</span><span class="s3">&quot; exists&quot;</span><span class="s1">)</span>
+<a name="l184"><span class="ln">184  </span></a>		
+<a name="l185"><span class="ln">185  </span></a>		<span class="s1">img = cv2.imread(img)</span>
+<a name="l186"><span class="ln">186  </span></a>	
+<a name="l187"><span class="ln">187  </span></a>	<span class="s0">return </span><span class="s1">img</span>
+<a name="l188"><span class="ln">188  </span></a>	
+<a name="l189"><span class="ln">189  </span></a><span class="s0">def </span><span class="s1">detect_face(img, detector_backend = </span><span class="s3">'opencv'</span><span class="s1">, grayscale = </span><span class="s0">False</span><span class="s1">, enforce_detection = </span><span class="s0">True</span><span class="s1">):</span>
+<a name="l190"><span class="ln">190  </span></a>	
+<a name="l191"><span class="ln">191  </span></a>	<span class="s1">home = str(Path.home())</span>
+<a name="l192"><span class="ln">192  </span></a>	
+<a name="l193"><span class="ln">193  </span></a>	<span class="s2">#if functions.preproces_face is called directly, then face_detector global variable might not been initialized.</span>
+<a name="l194"><span class="ln">194  </span></a>	<span class="s0">if not </span><span class="s3">&quot;face_detector&quot; </span><span class="s0">in </span><span class="s1">globals():</span>
+<a name="l195"><span class="ln">195  </span></a>		<span class="s1">initialize_detector(detector_backend = detector_backend)</span>
+<a name="l196"><span class="ln">196  </span></a>		
+<a name="l197"><span class="ln">197  </span></a>	<span class="s0">if </span><span class="s1">detector_backend == </span><span class="s3">'opencv'</span><span class="s1">:</span>
+<a name="l198"><span class="ln">198  </span></a>		
+<a name="l199"><span class="ln">199  </span></a>		<span class="s1">faces = []</span>
+<a name="l200"><span class="ln">200  </span></a>		
+<a name="l201"><span class="ln">201  </span></a>		<span class="s0">try</span><span class="s1">: </span>
+<a name="l202"><span class="ln">202  </span></a>			<span class="s1">faces = face_detector.detectMultiScale(img, </span><span class="s4">1.3</span><span class="s1">, </span><span class="s4">5</span><span class="s1">)</span>
+<a name="l203"><span class="ln">203  </span></a>		<span class="s0">except</span><span class="s1">:</span>
+<a name="l204"><span class="ln">204  </span></a>			<span class="s0">pass</span>
+<a name="l205"><span class="ln">205  </span></a>		
+<a name="l206"><span class="ln">206  </span></a>		<span class="s0">if </span><span class="s1">len(faces) &gt; </span><span class="s4">0</span><span class="s1">:</span>
+<a name="l207"><span class="ln">207  </span></a>			<span class="s1">x,y,w,h = faces[</span><span class="s4">0</span><span class="s1">] </span><span class="s2">#focus on the 1st face found in the image</span>
+<a name="l208"><span class="ln">208  </span></a>			<span class="s1">detected_face = img[int(y):int(y+h), int(x):int(x+w)]</span>
+<a name="l209"><span class="ln">209  </span></a>			<span class="s0">return </span><span class="s1">detected_face</span>
+<a name="l210"><span class="ln">210  </span></a>		
+<a name="l211"><span class="ln">211  </span></a>		<span class="s0">else</span><span class="s1">: </span><span class="s2">#if no face detected</span>
+<a name="l212"><span class="ln">212  </span></a>	
+<a name="l213"><span class="ln">213  </span></a>			<span class="s0">if </span><span class="s1">enforce_detection != </span><span class="s0">True</span><span class="s1">:			</span>
+<a name="l214"><span class="ln">214  </span></a>				<span class="s0">return </span><span class="s1">img</span>
+<a name="l215"><span class="ln">215  </span></a>	
+<a name="l216"><span class="ln">216  </span></a>			<span class="s0">else</span><span class="s1">:</span>
+<a name="l217"><span class="ln">217  </span></a>				<span class="s0">raise </span><span class="s1">ValueError(</span><span class="s3">&quot;Face could not be detected. Please confirm that the picture is a face photo or consider to set enforce_detection param to False.&quot;</span><span class="s1">)</span>
+<a name="l218"><span class="ln">218  </span></a>
+<a name="l219"><span class="ln">219  </span></a>	<span class="s0">elif </span><span class="s1">detector_backend == </span><span class="s3">'ssd'</span><span class="s1">:</span>
+<a name="l220"><span class="ln">220  </span></a>		
+<a name="l221"><span class="ln">221  </span></a>		<span class="s1">ssd_labels = [</span><span class="s3">&quot;img_id&quot;</span><span class="s1">, </span><span class="s3">&quot;is_face&quot;</span><span class="s1">, </span><span class="s3">&quot;confidence&quot;</span><span class="s1">, </span><span class="s3">&quot;left&quot;</span><span class="s1">, </span><span class="s3">&quot;top&quot;</span><span class="s1">, </span><span class="s3">&quot;right&quot;</span><span class="s1">, </span><span class="s3">&quot;bottom&quot;</span><span class="s1">]</span>
+<a name="l222"><span class="ln">222  </span></a>		
+<a name="l223"><span class="ln">223  </span></a>		<span class="s1">target_size = (</span><span class="s4">300</span><span class="s1">, </span><span class="s4">300</span><span class="s1">)</span>
+<a name="l224"><span class="ln">224  </span></a>		
+<a name="l225"><span class="ln">225  </span></a>		<span class="s1">base_img = img.copy() </span><span class="s2">#we will restore base_img to img later</span>
+<a name="l226"><span class="ln">226  </span></a>		
+<a name="l227"><span class="ln">227  </span></a>		<span class="s1">original_size = img.shape</span>
+<a name="l228"><span class="ln">228  </span></a>		
+<a name="l229"><span class="ln">229  </span></a>		<span class="s1">img = cv2.resize(img, target_size)</span>
+<a name="l230"><span class="ln">230  </span></a>		
+<a name="l231"><span class="ln">231  </span></a>		<span class="s1">aspect_ratio_x = (original_size[</span><span class="s4">1</span><span class="s1">] / target_size[</span><span class="s4">1</span><span class="s1">])</span>
+<a name="l232"><span class="ln">232  </span></a>		<span class="s1">aspect_ratio_y = (original_size[</span><span class="s4">0</span><span class="s1">] / target_size[</span><span class="s4">0</span><span class="s1">])</span>
+<a name="l233"><span class="ln">233  </span></a>		
+<a name="l234"><span class="ln">234  </span></a>		<span class="s1">imageBlob = cv2.dnn.blobFromImage(image = img)</span>
+<a name="l235"><span class="ln">235  </span></a>		
+<a name="l236"><span class="ln">236  </span></a>		<span class="s1">face_detector.setInput(imageBlob)</span>
+<a name="l237"><span class="ln">237  </span></a>		<span class="s1">detections = face_detector.forward()</span>
+<a name="l238"><span class="ln">238  </span></a>		
+<a name="l239"><span class="ln">239  </span></a>		<span class="s1">detections_df = pd.DataFrame(detections[</span><span class="s4">0</span><span class="s1">][</span><span class="s4">0</span><span class="s1">], columns = ssd_labels)</span>
+<a name="l240"><span class="ln">240  </span></a>		
+<a name="l241"><span class="ln">241  </span></a>		<span class="s1">detections_df = detections_df[detections_df[</span><span class="s3">'is_face'</span><span class="s1">] == </span><span class="s4">1</span><span class="s1">] </span><span class="s2">#0: background, 1: face</span>
+<a name="l242"><span class="ln">242  </span></a>		<span class="s1">detections_df = detections_df[detections_df[</span><span class="s3">'confidence'</span><span class="s1">] &gt;= </span><span class="s4">0.90</span><span class="s1">]</span>
+<a name="l243"><span class="ln">243  </span></a>		
+<a name="l244"><span class="ln">244  </span></a>		<span class="s1">detections_df[</span><span class="s3">'left'</span><span class="s1">] = (detections_df[</span><span class="s3">'left'</span><span class="s1">] * </span><span class="s4">300</span><span class="s1">).astype(int)</span>
+<a name="l245"><span class="ln">245  </span></a>		<span class="s1">detections_df[</span><span class="s3">'bottom'</span><span class="s1">] = (detections_df[</span><span class="s3">'bottom'</span><span class="s1">] * </span><span class="s4">300</span><span class="s1">).astype(int)</span>
+<a name="l246"><span class="ln">246  </span></a>		<span class="s1">detections_df[</span><span class="s3">'right'</span><span class="s1">] = (detections_df[</span><span class="s3">'right'</span><span class="s1">] * </span><span class="s4">300</span><span class="s1">).astype(int)</span>
+<a name="l247"><span class="ln">247  </span></a>		<span class="s1">detections_df[</span><span class="s3">'top'</span><span class="s1">] = (detections_df[</span><span class="s3">'top'</span><span class="s1">] * </span><span class="s4">300</span><span class="s1">).astype(int)</span>
+<a name="l248"><span class="ln">248  </span></a>		
+<a name="l249"><span class="ln">249  </span></a>		<span class="s0">if </span><span class="s1">detections_df.shape[</span><span class="s4">0</span><span class="s1">] &gt; </span><span class="s4">0</span><span class="s1">:</span>
+<a name="l250"><span class="ln">250  </span></a>			
+<a name="l251"><span class="ln">251  </span></a>			<span class="s2">#TODO: sort detections_df</span>
+<a name="l252"><span class="ln">252  </span></a>			
+<a name="l253"><span class="ln">253  </span></a>			<span class="s2">#get the first face in the image    </span>
+<a name="l254"><span class="ln">254  </span></a>			<span class="s1">instance = detections_df.iloc[</span><span class="s4">0</span><span class="s1">]</span>
+<a name="l255"><span class="ln">255  </span></a>			
+<a name="l256"><span class="ln">256  </span></a>			<span class="s1">left = instance[</span><span class="s3">&quot;left&quot;</span><span class="s1">]</span>
+<a name="l257"><span class="ln">257  </span></a>			<span class="s1">right = instance[</span><span class="s3">&quot;right&quot;</span><span class="s1">]</span>
+<a name="l258"><span class="ln">258  </span></a>			<span class="s1">bottom = instance[</span><span class="s3">&quot;bottom&quot;</span><span class="s1">]</span>
+<a name="l259"><span class="ln">259  </span></a>			<span class="s1">top = instance[</span><span class="s3">&quot;top&quot;</span><span class="s1">]</span>
+<a name="l260"><span class="ln">260  </span></a>			
+<a name="l261"><span class="ln">261  </span></a>			<span class="s1">detected_face = base_img[int(top*aspect_ratio_y):int(bottom*aspect_ratio_y), int(left*aspect_ratio_x):int(right*aspect_ratio_x)]</span>
+<a name="l262"><span class="ln">262  </span></a>			
+<a name="l263"><span class="ln">263  </span></a>			<span class="s0">return </span><span class="s1">detected_face</span>
+<a name="l264"><span class="ln">264  </span></a>			
+<a name="l265"><span class="ln">265  </span></a>		<span class="s0">else</span><span class="s1">: </span><span class="s2">#if no face detected</span>
+<a name="l266"><span class="ln">266  </span></a>	
+<a name="l267"><span class="ln">267  </span></a>			<span class="s0">if </span><span class="s1">enforce_detection != </span><span class="s0">True</span><span class="s1">:</span>
+<a name="l268"><span class="ln">268  </span></a>				<span class="s1">img = base_img.copy()</span>
+<a name="l269"><span class="ln">269  </span></a>				<span class="s0">return </span><span class="s1">img</span>
+<a name="l270"><span class="ln">270  </span></a>	
+<a name="l271"><span class="ln">271  </span></a>			<span class="s0">else</span><span class="s1">:</span>
+<a name="l272"><span class="ln">272  </span></a>				<span class="s0">raise </span><span class="s1">ValueError(</span><span class="s3">&quot;Face could not be detected. Please confirm that the picture is a face photo or consider to set enforce_detection param to False.&quot;</span><span class="s1">)</span>
+<a name="l273"><span class="ln">273  </span></a>	
+<a name="l274"><span class="ln">274  </span></a>	<span class="s0">elif </span><span class="s1">detector_backend == </span><span class="s3">'dlib'</span><span class="s1">:</span>
+<a name="l275"><span class="ln">275  </span></a>
+<a name="l276"><span class="ln">276  </span></a>		<span class="s1">detections = face_detector(img, </span><span class="s4">1</span><span class="s1">)</span>
+<a name="l277"><span class="ln">277  </span></a>		
+<a name="l278"><span class="ln">278  </span></a>		<span class="s0">if </span><span class="s1">len(detections) &gt; </span><span class="s4">0</span><span class="s1">:</span>
+<a name="l279"><span class="ln">279  </span></a>			
+<a name="l280"><span class="ln">280  </span></a>			<span class="s0">for </span><span class="s1">idx, d </span><span class="s0">in </span><span class="s1">enumerate(detections):</span>
+<a name="l281"><span class="ln">281  </span></a>				<span class="s1">left = d.left(); right = d.right()</span>
+<a name="l282"><span class="ln">282  </span></a>				<span class="s1">top = d.top(); bottom = d.bottom()</span>
+<a name="l283"><span class="ln">283  </span></a>				
+<a name="l284"><span class="ln">284  </span></a>				<span class="s1">detected_face = img[top:bottom, left:right]</span>
+<a name="l285"><span class="ln">285  </span></a>				
+<a name="l286"><span class="ln">286  </span></a>				<span class="s0">return </span><span class="s1">detected_face</span>
+<a name="l287"><span class="ln">287  </span></a>			
+<a name="l288"><span class="ln">288  </span></a>		<span class="s0">else</span><span class="s1">: </span><span class="s2">#if no face detected</span>
+<a name="l289"><span class="ln">289  </span></a>	
+<a name="l290"><span class="ln">290  </span></a>			<span class="s0">if </span><span class="s1">enforce_detection != </span><span class="s0">True</span><span class="s1">:			</span>
+<a name="l291"><span class="ln">291  </span></a>				<span class="s0">return </span><span class="s1">img</span>
+<a name="l292"><span class="ln">292  </span></a>	
+<a name="l293"><span class="ln">293  </span></a>			<span class="s0">else</span><span class="s1">:</span>
+<a name="l294"><span class="ln">294  </span></a>				<span class="s0">raise </span><span class="s1">ValueError(</span><span class="s3">&quot;Face could not be detected. Please confirm that the picture is a face photo or consider to set enforce_detection param to False.&quot;</span><span class="s1">) </span>
+<a name="l295"><span class="ln">295  </span></a>		
+<a name="l296"><span class="ln">296  </span></a>	<span class="s0">elif </span><span class="s1">detector_backend == </span><span class="s3">'mtcnn'</span><span class="s1">:</span>
+<a name="l297"><span class="ln">297  </span></a>		
+<a name="l298"><span class="ln">298  </span></a>		<span class="s1">img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) </span><span class="s2">#mtcnn expects RGB but OpenCV read BGR</span>
+<a name="l299"><span class="ln">299  </span></a>		<span class="s1">detections = face_detector.detect_faces(img_rgb)</span>
+<a name="l300"><span class="ln">300  </span></a>		
+<a name="l301"><span class="ln">301  </span></a>		<span class="s0">if </span><span class="s1">len(detections) &gt; </span><span class="s4">0</span><span class="s1">:</span>
+<a name="l302"><span class="ln">302  </span></a>			<span class="s1">detection = detections[</span><span class="s4">0</span><span class="s1">]</span>
+<a name="l303"><span class="ln">303  </span></a>			<span class="s1">x, y, w, h = detection[</span><span class="s3">&quot;box&quot;</span><span class="s1">]</span>
+<a name="l304"><span class="ln">304  </span></a>			<span class="s1">detected_face = img[int(y):int(y+h), int(x):int(x+w)]</span>
+<a name="l305"><span class="ln">305  </span></a>			<span class="s0">return </span><span class="s1">detected_face</span>
+<a name="l306"><span class="ln">306  </span></a>		
+<a name="l307"><span class="ln">307  </span></a>		<span class="s0">else</span><span class="s1">: </span><span class="s2">#if no face detected</span>
+<a name="l308"><span class="ln">308  </span></a>			<span class="s0">if not </span><span class="s1">enforce_detection:			</span>
+<a name="l309"><span class="ln">309  </span></a>				<span class="s0">return </span><span class="s1">img</span>
+<a name="l310"><span class="ln">310  </span></a>	
+<a name="l311"><span class="ln">311  </span></a>			<span class="s0">else</span><span class="s1">:</span>
+<a name="l312"><span class="ln">312  </span></a>				<span class="s0">raise </span><span class="s1">ValueError(</span><span class="s3">&quot;Face could not be detected. Please confirm that the picture is a face photo or consider to set enforce_detection param to False.&quot;</span><span class="s1">)</span>
+<a name="l313"><span class="ln">313  </span></a>	
+<a name="l314"><span class="ln">314  </span></a>	<span class="s0">else</span><span class="s1">:</span>
+<a name="l315"><span class="ln">315  </span></a>		<span class="s1">detectors = [</span><span class="s3">'opencv'</span><span class="s1">, </span><span class="s3">'ssd'</span><span class="s1">, </span><span class="s3">'dlib'</span><span class="s1">, </span><span class="s3">'mtcnn'</span><span class="s1">]</span>
+<a name="l316"><span class="ln">316  </span></a>		<span class="s0">raise </span><span class="s1">ValueError(</span><span class="s3">&quot;Valid backends are &quot;</span><span class="s1">, detectors,</span><span class="s3">&quot; but you passed &quot;</span><span class="s1">, detector_backend)</span>
+<a name="l317"><span class="ln">317  </span></a>
+<a name="l318"><span class="ln">318  </span></a><span class="s0">def </span><span class="s1">alignment_procedure(img, left_eye, right_eye):</span>
+<a name="l319"><span class="ln">319  </span></a>		
+<a name="l320"><span class="ln">320  </span></a>	<span class="s2">#this function aligns given face in img based on left and right eye coordinates</span>
+<a name="l321"><span class="ln">321  </span></a>	
+<a name="l322"><span class="ln">322  </span></a>	<span class="s1">left_eye_x, left_eye_y = left_eye</span>
+<a name="l323"><span class="ln">323  </span></a>	<span class="s1">right_eye_x, right_eye_y = right_eye</span>
+<a name="l324"><span class="ln">324  </span></a>	
+<a name="l325"><span class="ln">325  </span></a>	<span class="s2">#-----------------------</span>
+<a name="l326"><span class="ln">326  </span></a>	<span class="s2">#find rotation direction</span>
+<a name="l327"><span class="ln">327  </span></a>		
+<a name="l328"><span class="ln">328  </span></a>	<span class="s0">if </span><span class="s1">left_eye_y &gt; right_eye_y:</span>
+<a name="l329"><span class="ln">329  </span></a>		<span class="s1">point_3rd = (right_eye_x, left_eye_y)</span>
+<a name="l330"><span class="ln">330  </span></a>		<span class="s1">direction = -</span><span class="s4">1 </span><span class="s2">#rotate same direction to clock</span>
+<a name="l331"><span class="ln">331  </span></a>	<span class="s0">else</span><span class="s1">:</span>
+<a name="l332"><span class="ln">332  </span></a>		<span class="s1">point_3rd = (left_eye_x, right_eye_y)</span>
+<a name="l333"><span class="ln">333  </span></a>		<span class="s1">direction = </span><span class="s4">1 </span><span class="s2">#rotate inverse direction of clock</span>
+<a name="l334"><span class="ln">334  </span></a>	
+<a name="l335"><span class="ln">335  </span></a>	<span class="s2">#-----------------------</span>
+<a name="l336"><span class="ln">336  </span></a>	<span class="s2">#find length of triangle edges</span>
+<a name="l337"><span class="ln">337  </span></a>	
+<a name="l338"><span class="ln">338  </span></a>	<span class="s1">a = distance.findEuclideanDistance(np.array(left_eye), np.array(point_3rd))</span>
+<a name="l339"><span class="ln">339  </span></a>	<span class="s1">b = distance.findEuclideanDistance(np.array(right_eye), np.array(point_3rd))</span>
+<a name="l340"><span class="ln">340  </span></a>	<span class="s1">c = distance.findEuclideanDistance(np.array(right_eye), np.array(left_eye))</span>
+<a name="l341"><span class="ln">341  </span></a>	
+<a name="l342"><span class="ln">342  </span></a>	<span class="s2">#-----------------------</span>
+<a name="l343"><span class="ln">343  </span></a>	
+<a name="l344"><span class="ln">344  </span></a>	<span class="s2">#apply cosine rule</span>
+<a name="l345"><span class="ln">345  </span></a>			
+<a name="l346"><span class="ln">346  </span></a>	<span class="s0">if </span><span class="s1">b != </span><span class="s4">0 </span><span class="s0">and </span><span class="s1">c != </span><span class="s4">0</span><span class="s1">: </span><span class="s2">#this multiplication causes division by zero in cos_a calculation</span>
+<a name="l347"><span class="ln">347  </span></a>		
+<a name="l348"><span class="ln">348  </span></a>		<span class="s1">cos_a = (b*b + c*c - a*a)/(</span><span class="s4">2</span><span class="s1">*b*c)</span>
+<a name="l349"><span class="ln">349  </span></a>		<span class="s1">angle = np.arccos(cos_a) </span><span class="s2">#angle in radian</span>
+<a name="l350"><span class="ln">350  </span></a>		<span class="s1">angle = (angle * </span><span class="s4">180</span><span class="s1">) / math.pi </span><span class="s2">#radian to degree</span>
+<a name="l351"><span class="ln">351  </span></a>		
+<a name="l352"><span class="ln">352  </span></a>		<span class="s2">#-----------------------</span>
+<a name="l353"><span class="ln">353  </span></a>		<span class="s2">#rotate base image</span>
+<a name="l354"><span class="ln">354  </span></a>		
+<a name="l355"><span class="ln">355  </span></a>		<span class="s0">if </span><span class="s1">direction == -</span><span class="s4">1</span><span class="s1">:</span>
+<a name="l356"><span class="ln">356  </span></a>			<span class="s1">angle = </span><span class="s4">90 </span><span class="s1">- angle</span>
+<a name="l357"><span class="ln">357  </span></a>		
+<a name="l358"><span class="ln">358  </span></a>		<span class="s1">img = Image.fromarray(img)</span>
+<a name="l359"><span class="ln">359  </span></a>		<span class="s1">img = np.array(img.rotate(direction * angle))</span>
+<a name="l360"><span class="ln">360  </span></a>	
+<a name="l361"><span class="ln">361  </span></a>	<span class="s2">#-----------------------</span>
+<a name="l362"><span class="ln">362  </span></a>	
+<a name="l363"><span class="ln">363  </span></a>	<span class="s0">return </span><span class="s1">img </span><span class="s2">#return img anyway</span>
+<a name="l364"><span class="ln">364  </span></a>	
+<a name="l365"><span class="ln">365  </span></a><span class="s0">def </span><span class="s1">align_face(img, detector_backend = </span><span class="s3">'opencv'</span><span class="s1">):</span>
+<a name="l366"><span class="ln">366  </span></a>	
+<a name="l367"><span class="ln">367  </span></a>	<span class="s1">home = str(Path.home())</span>
+<a name="l368"><span class="ln">368  </span></a>	
+<a name="l369"><span class="ln">369  </span></a>	<span class="s0">if </span><span class="s1">(detector_backend == </span><span class="s3">'opencv'</span><span class="s1">) </span><span class="s0">or </span><span class="s1">(detector_backend == </span><span class="s3">'ssd'</span><span class="s1">):</span>
+<a name="l370"><span class="ln">370  </span></a>		
+<a name="l371"><span class="ln">371  </span></a>		<span class="s1">detected_face_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) </span><span class="s2">#eye detector expects gray scale image</span>
+<a name="l372"><span class="ln">372  </span></a>		
+<a name="l373"><span class="ln">373  </span></a>		<span class="s1">eyes = eye_detector.detectMultiScale(detected_face_gray)</span>
+<a name="l374"><span class="ln">374  </span></a>		
+<a name="l375"><span class="ln">375  </span></a>		<span class="s0">if </span><span class="s1">len(eyes) &gt;= </span><span class="s4">2</span><span class="s1">:</span>
+<a name="l376"><span class="ln">376  </span></a>			
+<a name="l377"><span class="ln">377  </span></a>			<span class="s2">#find the largest 2 eye</span>
+<a name="l378"><span class="ln">378  </span></a>			
+<a name="l379"><span class="ln">379  </span></a>			<span class="s1">base_eyes = eyes[:, </span><span class="s4">2</span><span class="s1">]</span>
+<a name="l380"><span class="ln">380  </span></a>			
+<a name="l381"><span class="ln">381  </span></a>			<span class="s1">items = []</span>
+<a name="l382"><span class="ln">382  </span></a>			<span class="s0">for </span><span class="s1">i </span><span class="s0">in </span><span class="s1">range(</span><span class="s4">0</span><span class="s1">, len(base_eyes)):</span>
+<a name="l383"><span class="ln">383  </span></a>				<span class="s1">item = (base_eyes[i], i)</span>
+<a name="l384"><span class="ln">384  </span></a>				<span class="s1">items.append(item)</span>
+<a name="l385"><span class="ln">385  </span></a>			
+<a name="l386"><span class="ln">386  </span></a>			<span class="s1">df = pd.DataFrame(items, columns = [</span><span class="s3">&quot;length&quot;</span><span class="s1">, </span><span class="s3">&quot;idx&quot;</span><span class="s1">]).sort_values(by=[</span><span class="s3">'length'</span><span class="s1">], ascending=</span><span class="s0">False</span><span class="s1">)</span>
+<a name="l387"><span class="ln">387  </span></a>			
+<a name="l388"><span class="ln">388  </span></a>			<span class="s1">eyes = eyes[df.idx.values[</span><span class="s4">0</span><span class="s1">:</span><span class="s4">2</span><span class="s1">]] </span><span class="s2">#eyes variable stores the largest 2 eye</span>
+<a name="l389"><span class="ln">389  </span></a>			
+<a name="l390"><span class="ln">390  </span></a>			<span class="s2">#-----------------------</span>
+<a name="l391"><span class="ln">391  </span></a>			<span class="s2">#decide left and right eye</span>
+<a name="l392"><span class="ln">392  </span></a>			
+<a name="l393"><span class="ln">393  </span></a>			<span class="s1">eye_1 = eyes[</span><span class="s4">0</span><span class="s1">]; eye_2 = eyes[</span><span class="s4">1</span><span class="s1">]</span>
+<a name="l394"><span class="ln">394  </span></a>			
+<a name="l395"><span class="ln">395  </span></a>			<span class="s0">if </span><span class="s1">eye_1[</span><span class="s4">0</span><span class="s1">] &lt; eye_2[</span><span class="s4">0</span><span class="s1">]:</span>
+<a name="l396"><span class="ln">396  </span></a>				<span class="s1">left_eye = eye_1; right_eye = eye_2</span>
+<a name="l397"><span class="ln">397  </span></a>			<span class="s0">else</span><span class="s1">:</span>
+<a name="l398"><span class="ln">398  </span></a>				<span class="s1">left_eye = eye_2; right_eye = eye_1</span>
+<a name="l399"><span class="ln">399  </span></a>			
+<a name="l400"><span class="ln">400  </span></a>			<span class="s2">#-----------------------</span>
+<a name="l401"><span class="ln">401  </span></a>			<span class="s2">#find center of eyes</span>
+<a name="l402"><span class="ln">402  </span></a>			
+<a name="l403"><span class="ln">403  </span></a>			<span class="s1">left_eye = (int(left_eye[</span><span class="s4">0</span><span class="s1">] + (left_eye[</span><span class="s4">2</span><span class="s1">] / </span><span class="s4">2</span><span class="s1">)), int(left_eye[</span><span class="s4">1</span><span class="s1">] + (left_eye[</span><span class="s4">3</span><span class="s1">] / </span><span class="s4">2</span><span class="s1">)))</span>
+<a name="l404"><span class="ln">404  </span></a>			<span class="s1">right_eye = (int(right_eye[</span><span class="s4">0</span><span class="s1">] + (right_eye[</span><span class="s4">2</span><span class="s1">]/</span><span class="s4">2</span><span class="s1">)), int(right_eye[</span><span class="s4">1</span><span class="s1">] + (right_eye[</span><span class="s4">3</span><span class="s1">]/</span><span class="s4">2</span><span class="s1">)))</span>
+<a name="l405"><span class="ln">405  </span></a>			
+<a name="l406"><span class="ln">406  </span></a>			<span class="s1">img = alignment_procedure(img, left_eye, right_eye)</span>
+<a name="l407"><span class="ln">407  </span></a>			
+<a name="l408"><span class="ln">408  </span></a>		<span class="s0">return </span><span class="s1">img </span><span class="s2">#return img anyway</span>
+<a name="l409"><span class="ln">409  </span></a>	
+<a name="l410"><span class="ln">410  </span></a>	<span class="s0">elif </span><span class="s1">detector_backend == </span><span class="s3">'dlib'</span><span class="s1">:</span>
+<a name="l411"><span class="ln">411  </span></a>		
+<a name="l412"><span class="ln">412  </span></a>		<span class="s0">import </span><span class="s1">dlib </span><span class="s2">#this is not a must dependency in deepface</span>
+<a name="l413"><span class="ln">413  </span></a>		
+<a name="l414"><span class="ln">414  </span></a>		<span class="s1">detections = face_detector(img, </span><span class="s4">1</span><span class="s1">)</span>
+<a name="l415"><span class="ln">415  </span></a>		
+<a name="l416"><span class="ln">416  </span></a>		<span class="s0">if </span><span class="s1">len(detections) &gt; </span><span class="s4">0</span><span class="s1">:</span>
+<a name="l417"><span class="ln">417  </span></a>			<span class="s1">detected_face = detections[</span><span class="s4">0</span><span class="s1">]</span>
+<a name="l418"><span class="ln">418  </span></a>			<span class="s1">img_shape = sp(img, detected_face)</span>
+<a name="l419"><span class="ln">419  </span></a>			<span class="s1">img = dlib.get_face_chip(img, img_shape, size = img.shape[</span><span class="s4">0</span><span class="s1">])</span>
+<a name="l420"><span class="ln">420  </span></a>			
+<a name="l421"><span class="ln">421  </span></a>		<span class="s0">return </span><span class="s1">img </span><span class="s2">#return img anyway</span>
+<a name="l422"><span class="ln">422  </span></a>	
+<a name="l423"><span class="ln">423  </span></a>	<span class="s0">elif </span><span class="s1">detector_backend == </span><span class="s3">'mtcnn'</span><span class="s1">:</span>
+<a name="l424"><span class="ln">424  </span></a>		
+<a name="l425"><span class="ln">425  </span></a>		<span class="s1">img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) </span><span class="s2">#mtcnn expects RGB but OpenCV read BGR</span>
+<a name="l426"><span class="ln">426  </span></a>		<span class="s1">detections = face_detector.detect_faces(img_rgb)</span>
+<a name="l427"><span class="ln">427  </span></a>		
+<a name="l428"><span class="ln">428  </span></a>		<span class="s0">if </span><span class="s1">len(detections) &gt; </span><span class="s4">0</span><span class="s1">:</span>
+<a name="l429"><span class="ln">429  </span></a>			<span class="s1">detection = detections[</span><span class="s4">0</span><span class="s1">]</span>
+<a name="l430"><span class="ln">430  </span></a>			
+<a name="l431"><span class="ln">431  </span></a>			<span class="s1">keypoints = detection[</span><span class="s3">&quot;keypoints&quot;</span><span class="s1">]</span>
+<a name="l432"><span class="ln">432  </span></a>			<span class="s1">left_eye = keypoints[</span><span class="s3">&quot;left_eye&quot;</span><span class="s1">]</span>
+<a name="l433"><span class="ln">433  </span></a>			<span class="s1">right_eye = keypoints[</span><span class="s3">&quot;right_eye&quot;</span><span class="s1">]</span>
+<a name="l434"><span class="ln">434  </span></a>			
+<a name="l435"><span class="ln">435  </span></a>			<span class="s1">img = alignment_procedure(img, left_eye, right_eye)</span>
+<a name="l436"><span class="ln">436  </span></a>				
+<a name="l437"><span class="ln">437  </span></a>		<span class="s0">return </span><span class="s1">img </span><span class="s2">#return img anyway</span>
+<a name="l438"><span class="ln">438  </span></a>	
+<a name="l439"><span class="ln">439  </span></a><span class="s0">def </span><span class="s1">preprocess_face(img, target_size=(</span><span class="s4">224</span><span class="s1">, </span><span class="s4">224</span><span class="s1">), grayscale = </span><span class="s0">False</span><span class="s1">, enforce_detection = </span><span class="s0">True</span><span class="s1">, detector_backend = </span><span class="s3">'opencv'</span><span class="s1">):</span>
+<a name="l440"><span class="ln">440  </span></a>	
+<a name="l441"><span class="ln">441  </span></a>	<span class="s2">#img_path = copy.copy(img)</span>
+<a name="l442"><span class="ln">442  </span></a>	
+<a name="l443"><span class="ln">443  </span></a>	<span class="s2">#img might be path, base64 or numpy array. Convert it to numpy whatever it is.</span>
+<a name="l444"><span class="ln">444  </span></a>	<span class="s1">img = load_image(img)</span>
+<a name="l445"><span class="ln">445  </span></a>	<span class="s1">base_img = img.copy()</span>
+<a name="l446"><span class="ln">446  </span></a>	
+<a name="l447"><span class="ln">447  </span></a>	<span class="s1">img = detect_face(img = img, detector_backend = detector_backend, grayscale = grayscale, enforce_detection = enforce_detection)</span>
+<a name="l448"><span class="ln">448  </span></a>	
+<a name="l449"><span class="ln">449  </span></a>	<span class="s2">#--------------------------</span>
+<a name="l450"><span class="ln">450  </span></a>	
+<a name="l451"><span class="ln">451  </span></a>	<span class="s0">if </span><span class="s1">img.shape[</span><span class="s4">0</span><span class="s1">] &gt; </span><span class="s4">0 </span><span class="s0">and </span><span class="s1">img.shape[</span><span class="s4">1</span><span class="s1">] &gt; </span><span class="s4">0</span><span class="s1">:</span>
+<a name="l452"><span class="ln">452  </span></a>		<span class="s1">img = align_face(img = img, detector_backend = detector_backend)</span>
+<a name="l453"><span class="ln">453  </span></a>	<span class="s0">else</span><span class="s1">:</span>
+<a name="l454"><span class="ln">454  </span></a>		
+<a name="l455"><span class="ln">455  </span></a>		<span class="s0">if </span><span class="s1">enforce_detection == </span><span class="s0">True</span><span class="s1">:</span>
+<a name="l456"><span class="ln">456  </span></a>			<span class="s0">raise </span><span class="s1">ValueError(</span><span class="s3">&quot;Detected face shape is &quot;</span><span class="s1">, img.shape,</span><span class="s3">&quot;. Consider to set enforce_detection argument to False.&quot;</span><span class="s1">)</span>
+<a name="l457"><span class="ln">457  </span></a>		<span class="s0">else</span><span class="s1">: </span><span class="s2">#restore base image </span>
+<a name="l458"><span class="ln">458  </span></a>			<span class="s1">img = base_img.copy()</span>
+<a name="l459"><span class="ln">459  </span></a>		
+<a name="l460"><span class="ln">460  </span></a>	<span class="s2">#--------------------------</span>
+<a name="l461"><span class="ln">461  </span></a>	
+<a name="l462"><span class="ln">462  </span></a>	<span class="s2">#post-processing</span>
+<a name="l463"><span class="ln">463  </span></a>	<span class="s0">if </span><span class="s1">grayscale == </span><span class="s0">True</span><span class="s1">:</span>
+<a name="l464"><span class="ln">464  </span></a>		<span class="s1">img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)</span>
+<a name="l465"><span class="ln">465  </span></a>		
+<a name="l466"><span class="ln">466  </span></a>	<span class="s1">img = cv2.resize(img, target_size)</span>
+<a name="l467"><span class="ln">467  </span></a>	<span class="s1">img_pixels = image.img_to_array(img)</span>
+<a name="l468"><span class="ln">468  </span></a>	<span class="s1">img_pixels = np.expand_dims(img_pixels, axis = </span><span class="s4">0</span><span class="s1">)</span>
+<a name="l469"><span class="ln">469  </span></a>	<span class="s1">img_pixels /= </span><span class="s4">255 </span><span class="s2">#normalize input in [0, 1]</span>
+<a name="l470"><span class="ln">470  </span></a>	
+<a name="l471"><span class="ln">471  </span></a>	<span class="s0">return </span><span class="s1">img_pixels</span>
+<a name="l472"><span class="ln">472  </span></a>
+<a name="l473"><span class="ln">473  </span></a><span class="s0">def </span><span class="s1">find_input_shape(model):</span>
+<a name="l474"><span class="ln">474  </span></a>	
+<a name="l475"><span class="ln">475  </span></a>	<span class="s2">#face recognition models have different size of inputs</span>
+<a name="l476"><span class="ln">476  </span></a>	<span class="s2">#my environment returns (None, 224, 224, 3) but some people mentioned that they got [(None, 224, 224, 3)]. I think this is because of version issue.</span>
+<a name="l477"><span class="ln">477  </span></a>	
+<a name="l478"><span class="ln">478  </span></a>	<span class="s1">input_shape = model.layers[</span><span class="s4">0</span><span class="s1">].input_shape</span>
+<a name="l479"><span class="ln">479  </span></a>	
+<a name="l480"><span class="ln">480  </span></a>	<span class="s0">if </span><span class="s1">type(input_shape) == list:</span>
+<a name="l481"><span class="ln">481  </span></a>		<span class="s1">input_shape = input_shape[</span><span class="s4">0</span><span class="s1">][</span><span class="s4">1</span><span class="s1">:</span><span class="s4">3</span><span class="s1">]</span>
+<a name="l482"><span class="ln">482  </span></a>	<span class="s0">else</span><span class="s1">:</span>
+<a name="l483"><span class="ln">483  </span></a>		<span class="s1">input_shape = input_shape[</span><span class="s4">1</span><span class="s1">:</span><span class="s4">3</span><span class="s1">]</span>
+<a name="l484"><span class="ln">484  </span></a>	
+<a name="l485"><span class="ln">485  </span></a>	<span class="s0">return </span><span class="s1">input_shape</span>
+<a name="l486"><span class="ln">486  </span></a>	
+<a name="l487"><span class="ln">487  </span></a></pre>
+</body>
+</html>

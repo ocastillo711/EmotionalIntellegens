@@ -1,0 +1,338 @@
+<html>
+<head>
+<title>realtime.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #0033b3;}
+.s1 { color: #080808;}
+.s2 { color: #8c8c8c; font-style: italic;}
+.s3 { color: #008080; font-weight: bold;}
+.s4 { color: #067d17;}
+.s5 { color: #1750eb;}
+.ln { color: #adadad; font-weight: normal; font-style: normal; }
+</style>
+</head>
+<body bgcolor="#ffffff">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+realtime.py</font>
+</center></td></tr></table>
+<pre><a name="l1"><span class="ln">1    </span></a><span class="s0">import </span><span class="s1">os</span>
+<a name="l2"><span class="ln">2    </span></a><span class="s0">from </span><span class="s1">tqdm </span><span class="s0">import </span><span class="s1">tqdm</span>
+<a name="l3"><span class="ln">3    </span></a><span class="s0">import </span><span class="s1">numpy </span><span class="s0">as </span><span class="s1">np</span>
+<a name="l4"><span class="ln">4    </span></a><span class="s0">import </span><span class="s1">pandas </span><span class="s0">as </span><span class="s1">pd</span>
+<a name="l5"><span class="ln">5    </span></a><span class="s0">import </span><span class="s1">cv2</span>
+<a name="l6"><span class="ln">6    </span></a><span class="s0">import </span><span class="s1">time</span>
+<a name="l7"><span class="ln">7    </span></a><span class="s0">import </span><span class="s1">re</span>
+<a name="l8"><span class="ln">8    </span></a><span class="s0">import </span><span class="s1">sys </span><span class="s2">#SYTSEM</span>
+<a name="l9"><span class="ln">9    </span></a><span class="s0">import </span><span class="s1">PySimpleGUI </span><span class="s0">as </span><span class="s1">sg</span>
+<a name="l10"><span class="ln">10   </span></a>
+<a name="l11"><span class="ln">11   </span></a>
+<a name="l12"><span class="ln">12   </span></a>
+<a name="l13"><span class="ln">13   </span></a><span class="s1">os.environ[</span><span class="s3">'TF_CPP_MIN_LOG_LEVEL'</span><span class="s1">] = </span><span class="s3">'2'</span>
+<a name="l14"><span class="ln">14   </span></a>
+<a name="l15"><span class="ln">15   </span></a>
+<a name="l16"><span class="ln">16   </span></a><span class="s0">from </span><span class="s1">deepface </span><span class="s0">import </span><span class="s1">DeepFace</span>
+<a name="l17"><span class="ln">17   </span></a><span class="s0">from </span><span class="s1">deepface.commons </span><span class="s0">import </span><span class="s1">functions, realtime, distance </span><span class="s0">as </span><span class="s1">dst</span>
+<a name="l18"><span class="ln">18   </span></a>
+<a name="l19"><span class="ln">19   </span></a><span class="s2"># Initialize Graphics</span>
+<a name="l20"><span class="ln">20   </span></a><span class="s1">icon_logo64 = </span><span class="s4">b'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'</span>
+<a name="l21"><span class="ln">21   </span></a>
+<a name="l22"><span class="ln">22   </span></a>
+<a name="l23"><span class="ln">23   </span></a>
+<a name="l24"><span class="ln">24   </span></a><span class="s0">def </span><span class="s1">analysis(db_path, model_name, distance_metric, enable_face_analysis = </span><span class="s0">False</span>
+<a name="l25"><span class="ln">25   </span></a>				<span class="s1">, source = </span><span class="s5">0</span><span class="s1">, time_threshold = </span><span class="s5">5</span><span class="s1">, frame_threshold = </span><span class="s5">5</span><span class="s1">):</span>
+<a name="l26"><span class="ln">26   </span></a>	<span class="s2">#Intitalize the input shape</span>
+<a name="l27"><span class="ln">27   </span></a>	<span class="s2">#input_shape = (224, 224); input_shape_x = input_shape[0]; input_shape_y = input_shape[1]</span>
+<a name="l28"><span class="ln">28   </span></a>
+<a name="l29"><span class="ln">29   </span></a>	<span class="s1">employees = []</span>
+<a name="l30"><span class="ln">30   </span></a>	<span class="s2">#check passed db folder exists</span>
+<a name="l31"><span class="ln">31   </span></a>	<span class="s0">if </span><span class="s1">os.path.isdir(db_path) == </span><span class="s0">True</span><span class="s1">:</span>
+<a name="l32"><span class="ln">32   </span></a>		<span class="s0">for </span><span class="s1">r, d, f </span><span class="s0">in </span><span class="s1">os.walk(db_path): </span><span class="s2"># r=root, d=directories, f = files</span>
+<a name="l33"><span class="ln">33   </span></a>			<span class="s0">for </span><span class="s1">file </span><span class="s0">in </span><span class="s1">f:</span>
+<a name="l34"><span class="ln">34   </span></a>				<span class="s0">if </span><span class="s1">(</span><span class="s3">'.jpg' </span><span class="s0">in </span><span class="s1">file):</span>
+<a name="l35"><span class="ln">35   </span></a>					<span class="s2">#exact_path = os.path.join(r, file)</span>
+<a name="l36"><span class="ln">36   </span></a>					<span class="s1">exact_path = r + </span><span class="s3">&quot;/&quot; </span><span class="s1">+ file</span>
+<a name="l37"><span class="ln">37   </span></a>					<span class="s2">#print(exact_path)</span>
+<a name="l38"><span class="ln">38   </span></a>					<span class="s1">employees.append(exact_path)</span>
+<a name="l39"><span class="ln">39   </span></a>
+<a name="l40"><span class="ln">40   </span></a>
+<a name="l41"><span class="ln">41   </span></a>
+<a name="l42"><span class="ln">42   </span></a>	<span class="s2">#------------------------</span>
+<a name="l43"><span class="ln">43   </span></a>
+<a name="l44"><span class="ln">44   </span></a>	<span class="s0">if </span><span class="s1">len(employees) &gt; </span><span class="s5">0</span><span class="s1">:</span>
+<a name="l45"><span class="ln">45   </span></a>
+<a name="l46"><span class="ln">46   </span></a>		<span class="s1">model = DeepFace.build_model(model_name)</span>
+<a name="l47"><span class="ln">47   </span></a>		<span class="s1">print(model_name,</span><span class="s3">&quot; is built&quot;</span><span class="s1">)</span>
+<a name="l48"><span class="ln">48   </span></a>
+<a name="l49"><span class="ln">49   </span></a>		<span class="s2">#------------------------</span>
+<a name="l50"><span class="ln">50   </span></a>
+<a name="l51"><span class="ln">51   </span></a>		<span class="s1">input_shape = functions.find_input_shape(model)</span>
+<a name="l52"><span class="ln">52   </span></a>		<span class="s1">input_shape_x = input_shape[</span><span class="s5">0</span><span class="s1">]</span>
+<a name="l53"><span class="ln">53   </span></a>		<span class="s1">input_shape_y = input_shape[</span><span class="s5">1</span><span class="s1">]</span>
+<a name="l54"><span class="ln">54   </span></a>
+<a name="l55"><span class="ln">55   </span></a>		
+<a name="l56"><span class="ln">56   </span></a>	<span class="s2">#------------------------</span>
+<a name="l57"><span class="ln">57   </span></a>	<span class="s2">#facial attribute analysis models</span>
+<a name="l58"><span class="ln">58   </span></a>		
+<a name="l59"><span class="ln">59   </span></a>	<span class="s0">if </span><span class="s1">enable_face_analysis == </span><span class="s0">True</span><span class="s1">:</span>
+<a name="l60"><span class="ln">60   </span></a>		
+<a name="l61"><span class="ln">61   </span></a>		<span class="s1">tic = time.time()</span>
+<a name="l62"><span class="ln">62   </span></a>				
+<a name="l63"><span class="ln">63   </span></a>		<span class="s1">emotion_model = DeepFace.build_model(</span><span class="s3">'Emotion'</span><span class="s1">)</span>
+<a name="l64"><span class="ln">64   </span></a>		<span class="s2">#sg.popup_quick_message('Emotion Model Loaded')</span>
+<a name="l65"><span class="ln">65   </span></a>		<span class="s1">print(</span><span class="s3">&quot;Emotion model loaded&quot;</span><span class="s1">)</span>
+<a name="l66"><span class="ln">66   </span></a>
+<a name="l67"><span class="ln">67   </span></a>		<span class="s1">toc = time.time()</span>
+<a name="l68"><span class="ln">68   </span></a>		
+<a name="l69"><span class="ln">69   </span></a>		<span class="s1">print(</span><span class="s3">&quot;Facial attibute analysis models loaded in &quot;</span><span class="s1">,toc-tic,</span><span class="s3">&quot; seconds&quot;</span><span class="s1">)</span>
+<a name="l70"><span class="ln">70   </span></a>	
+<a name="l71"><span class="ln">71   </span></a>	<span class="s2">#------------------------</span>
+<a name="l72"><span class="ln">72   </span></a>	
+<a name="l73"><span class="ln">73   </span></a>	<span class="s2">#find embeddings for employee list</span>
+<a name="l74"><span class="ln">74   </span></a>	
+<a name="l75"><span class="ln">75   </span></a>	<span class="s1">tic = time.time()</span>
+<a name="l76"><span class="ln">76   </span></a>	
+<a name="l77"><span class="ln">77   </span></a>	<span class="s1">pbar = tqdm(range(</span><span class="s5">0</span><span class="s1">, len(employees)), desc=</span><span class="s3">'Finding embeddings'</span><span class="s1">)</span>
+<a name="l78"><span class="ln">78   </span></a>	
+<a name="l79"><span class="ln">79   </span></a>	<span class="s1">embeddings = []</span>
+<a name="l80"><span class="ln">80   </span></a>	<span class="s2">#for employee in employees:</span>
+<a name="l81"><span class="ln">81   </span></a>	<span class="s0">for </span><span class="s1">index </span><span class="s0">in </span><span class="s1">pbar:</span>
+<a name="l82"><span class="ln">82   </span></a>		<span class="s1">employee = employees[index]</span>
+<a name="l83"><span class="ln">83   </span></a>		<span class="s1">pbar.set_description(</span><span class="s3">&quot;Finding embedding for %s&quot; </span><span class="s1">% (employee.split(</span><span class="s3">&quot;/&quot;</span><span class="s1">)[-</span><span class="s5">1</span><span class="s1">]))</span>
+<a name="l84"><span class="ln">84   </span></a>		<span class="s1">embedding = []</span>
+<a name="l85"><span class="ln">85   </span></a>		<span class="s1">captured_frame = functions.preprocess_face(img = employee, target_size = (input_shape_y, input_shape_x), enforce_detection = </span><span class="s0">False</span><span class="s1">)</span>
+<a name="l86"><span class="ln">86   </span></a>		<span class="s1">img_representation = model.predict(captured_frame)[</span><span class="s5">0</span><span class="s1">, :]</span>
+<a name="l87"><span class="ln">87   </span></a>		
+<a name="l88"><span class="ln">88   </span></a>		<span class="s1">embedding.append(employee)</span>
+<a name="l89"><span class="ln">89   </span></a>		<span class="s1">embedding.append(img_representation)</span>
+<a name="l90"><span class="ln">90   </span></a>		<span class="s1">embeddings.append(embedding)</span>
+<a name="l91"><span class="ln">91   </span></a>	
+<a name="l92"><span class="ln">92   </span></a>	<span class="s1">df = pd.DataFrame(embeddings, columns = [</span><span class="s3">'employee'</span><span class="s1">, </span><span class="s3">'embedding'</span><span class="s1">])</span>
+<a name="l93"><span class="ln">93   </span></a>	<span class="s1">df[</span><span class="s3">'distance_metric'</span><span class="s1">] = distance_metric</span>
+<a name="l94"><span class="ln">94   </span></a>	
+<a name="l95"><span class="ln">95   </span></a>	<span class="s1">toc = time.time()</span>
+<a name="l96"><span class="ln">96   </span></a>	
+<a name="l97"><span class="ln">97   </span></a>	<span class="s1">print(</span><span class="s3">&quot;Embeddings found for given data set in &quot;</span><span class="s1">, toc-tic,</span><span class="s3">&quot; seconds&quot;</span><span class="s1">)</span>
+<a name="l98"><span class="ln">98   </span></a>	
+<a name="l99"><span class="ln">99   </span></a>	<span class="s2">#-----------------------</span>
+<a name="l100"><span class="ln">100  </span></a>
+<a name="l101"><span class="ln">101  </span></a>	<span class="s1">pivot_img_size = </span><span class="s5">112 </span><span class="s2">#face recognition result image</span>
+<a name="l102"><span class="ln">102  </span></a>
+<a name="l103"><span class="ln">103  </span></a>	<span class="s2">#-----------------------</span>
+<a name="l104"><span class="ln">104  </span></a>	
+<a name="l105"><span class="ln">105  </span></a>	<span class="s1">opencv_path = functions.get_opencv_path()</span>
+<a name="l106"><span class="ln">106  </span></a>	<span class="s1">face_detector_path = opencv_path+</span><span class="s3">&quot;haarcascade_frontalface_default.xml&quot;</span>
+<a name="l107"><span class="ln">107  </span></a>	<span class="s1">face_cascade = cv2.CascadeClassifier(face_detector_path)</span>
+<a name="l108"><span class="ln">108  </span></a>	
+<a name="l109"><span class="ln">109  </span></a>	<span class="s2">#-----------------------Declare Variables</span>
+<a name="l110"><span class="ln">110  </span></a>
+<a name="l111"><span class="ln">111  </span></a>	<span class="s1">freeze = </span><span class="s0">False</span>
+<a name="l112"><span class="ln">112  </span></a>	<span class="s1">face_detected = </span><span class="s0">False</span>
+<a name="l113"><span class="ln">113  </span></a>	<span class="s1">face_included_frames = </span><span class="s5">0 </span><span class="s2">#freeze screen if face detected sequantially 5 frames</span>
+<a name="l114"><span class="ln">114  </span></a>	<span class="s1">freezed_frame = </span><span class="s5">0</span>
+<a name="l115"><span class="ln">115  </span></a>	<span class="s1">tic = time.time()</span>
+<a name="l116"><span class="ln">116  </span></a>
+<a name="l117"><span class="ln">117  </span></a>	<span class="s2"># START CAMERA</span>
+<a name="l118"><span class="ln">118  </span></a>	<span class="s1">win_started = </span><span class="s0">False</span>
+<a name="l119"><span class="ln">119  </span></a>
+<a name="l120"><span class="ln">120  </span></a>	<span class="s1">captured_video = cv2.VideoCapture(source) </span><span class="s2">#Start webcam</span>
+<a name="l121"><span class="ln">121  </span></a>
+<a name="l122"><span class="ln">122  </span></a>	<span class="s0">while</span><span class="s1">(</span><span class="s0">True</span><span class="s1">):</span>
+<a name="l123"><span class="ln">123  </span></a>		<span class="s1">ret, captured_frame = captured_video.read()</span>
+<a name="l124"><span class="ln">124  </span></a>		
+<a name="l125"><span class="ln">125  </span></a>		<span class="s2">#cv2.namedWindow('captured_frame', cv2.WINDOW_FREERATIO)</span>
+<a name="l126"><span class="ln">126  </span></a>		<span class="s2">#cv2.setWindowProperty('captured_frame', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)</span>
+<a name="l127"><span class="ln">127  </span></a>		
+<a name="l128"><span class="ln">128  </span></a>		<span class="s1">raw_img = captured_frame.copy()</span>
+<a name="l129"><span class="ln">129  </span></a>		<span class="s1">resolution = captured_frame.shape</span>
+<a name="l130"><span class="ln">130  </span></a>		
+<a name="l131"><span class="ln">131  </span></a>		<span class="s1">resolution_x = captured_frame.shape[</span><span class="s5">1</span><span class="s1">]; resolution_y = captured_frame.shape[</span><span class="s5">0</span><span class="s1">]</span>
+<a name="l132"><span class="ln">132  </span></a>
+<a name="l133"><span class="ln">133  </span></a>		<span class="s0">if </span><span class="s1">freeze == </span><span class="s0">False</span><span class="s1">: </span>
+<a name="l134"><span class="ln">134  </span></a>			<span class="s1">faces = face_cascade.detectMultiScale(captured_frame, </span><span class="s5">1.3</span><span class="s1">, </span><span class="s5">5</span><span class="s1">)</span>
+<a name="l135"><span class="ln">135  </span></a>			
+<a name="l136"><span class="ln">136  </span></a>			<span class="s0">if </span><span class="s1">len(faces) == </span><span class="s5">0</span><span class="s1">:</span>
+<a name="l137"><span class="ln">137  </span></a>				<span class="s1">face_included_frames = </span><span class="s5">0</span>
+<a name="l138"><span class="ln">138  </span></a>		<span class="s0">else</span><span class="s1">: </span>
+<a name="l139"><span class="ln">139  </span></a>			<span class="s1">faces = []</span>
+<a name="l140"><span class="ln">140  </span></a>		
+<a name="l141"><span class="ln">141  </span></a>		<span class="s1">detected_faces = []</span>
+<a name="l142"><span class="ln">142  </span></a>		<span class="s1">face_index = </span><span class="s5">0</span>
+<a name="l143"><span class="ln">143  </span></a>		<span class="s0">for </span><span class="s1">(x,y,w,h) </span><span class="s0">in </span><span class="s1">faces:</span>
+<a name="l144"><span class="ln">144  </span></a>			<span class="s0">if </span><span class="s1">w &gt; </span><span class="s5">130</span><span class="s1">: </span><span class="s2">#discard small detected faces</span>
+<a name="l145"><span class="ln">145  </span></a>				
+<a name="l146"><span class="ln">146  </span></a>				<span class="s1">face_detected = </span><span class="s0">True</span>
+<a name="l147"><span class="ln">147  </span></a>				<span class="s0">if </span><span class="s1">face_index == </span><span class="s5">0</span><span class="s1">:</span>
+<a name="l148"><span class="ln">148  </span></a>					<span class="s1">face_included_frames = face_included_frames + </span><span class="s5">1 </span><span class="s2">#increase frame for a single face</span>
+<a name="l149"><span class="ln">149  </span></a>				
+<a name="l150"><span class="ln">150  </span></a>				<span class="s1">cv2.rectangle(captured_frame, (x, y), (x + w, y + h), (</span><span class="s5">67</span><span class="s1">, </span><span class="s5">67</span><span class="s1">, </span><span class="s5">67</span><span class="s1">), </span><span class="s5">1</span><span class="s1">) </span><span class="s2">#draw rectangle to main image</span>
+<a name="l151"><span class="ln">151  </span></a>				
+<a name="l152"><span class="ln">152  </span></a>				<span class="s1">cv2.putText(captured_frame, str(frame_threshold - face_included_frames), (int(x + w / </span><span class="s5">4</span><span class="s1">), int(y + h / </span><span class="s5">1.5</span><span class="s1">)), cv2.FONT_HERSHEY_SIMPLEX, </span><span class="s5">4</span><span class="s1">, (</span><span class="s5">255</span><span class="s1">, </span><span class="s5">255</span><span class="s1">, </span><span class="s5">255</span><span class="s1">), </span><span class="s5">2</span><span class="s1">)</span>
+<a name="l153"><span class="ln">153  </span></a>				
+<a name="l154"><span class="ln">154  </span></a>				<span class="s1">detected_face = captured_frame[int(y):int(y + h), int(x):int(x + w)] </span><span class="s2">#crop detected face</span>
+<a name="l155"><span class="ln">155  </span></a>				
+<a name="l156"><span class="ln">156  </span></a>				<span class="s2">#-------------------------------------</span>
+<a name="l157"><span class="ln">157  </span></a>				
+<a name="l158"><span class="ln">158  </span></a>				<span class="s1">detected_faces.append((x,y,w,h))</span>
+<a name="l159"><span class="ln">159  </span></a>				<span class="s1">face_index = face_index + </span><span class="s5">1</span>
+<a name="l160"><span class="ln">160  </span></a>				
+<a name="l161"><span class="ln">161  </span></a>				<span class="s2">#-------------------------------------</span>
+<a name="l162"><span class="ln">162  </span></a>				
+<a name="l163"><span class="ln">163  </span></a>		<span class="s0">if </span><span class="s1">face_detected == </span><span class="s0">True and </span><span class="s1">face_included_frames == frame_threshold </span><span class="s0">and </span><span class="s1">freeze == </span><span class="s0">False</span><span class="s1">:</span>
+<a name="l164"><span class="ln">164  </span></a>			<span class="s1">freeze = </span><span class="s0">True</span>
+<a name="l165"><span class="ln">165  </span></a>			<span class="s2">#base_img = captured_frame.copy()</span>
+<a name="l166"><span class="ln">166  </span></a>			<span class="s1">base_img = raw_img.copy()</span>
+<a name="l167"><span class="ln">167  </span></a>			<span class="s1">detected_faces_final = detected_faces.copy()</span>
+<a name="l168"><span class="ln">168  </span></a>			<span class="s1">tic = time.time()</span>
+<a name="l169"><span class="ln">169  </span></a>		
+<a name="l170"><span class="ln">170  </span></a>		<span class="s0">if </span><span class="s1">freeze == </span><span class="s0">True</span><span class="s1">:</span>
+<a name="l171"><span class="ln">171  </span></a>
+<a name="l172"><span class="ln">172  </span></a>			<span class="s1">toc = time.time()</span>
+<a name="l173"><span class="ln">173  </span></a>			<span class="s0">if </span><span class="s1">(toc - tic) &lt; time_threshold:</span>
+<a name="l174"><span class="ln">174  </span></a>				
+<a name="l175"><span class="ln">175  </span></a>				<span class="s0">if </span><span class="s1">freezed_frame == </span><span class="s5">0</span><span class="s1">:</span>
+<a name="l176"><span class="ln">176  </span></a>					<span class="s1">freeze_img = base_img.copy()</span>
+<a name="l177"><span class="ln">177  </span></a>					<span class="s2">#freeze_img = np.zeros(resolution, np.uint8) #here, np.uint8 handles showing white area issue</span>
+<a name="l178"><span class="ln">178  </span></a>					
+<a name="l179"><span class="ln">179  </span></a>					<span class="s0">for </span><span class="s1">detected_face </span><span class="s0">in </span><span class="s1">detected_faces_final:</span>
+<a name="l180"><span class="ln">180  </span></a>						<span class="s1">x = detected_face[</span><span class="s5">0</span><span class="s1">]; y = detected_face[</span><span class="s5">1</span><span class="s1">]</span>
+<a name="l181"><span class="ln">181  </span></a>						<span class="s1">w = detected_face[</span><span class="s5">2</span><span class="s1">]; h = detected_face[</span><span class="s5">3</span><span class="s1">]</span>
+<a name="l182"><span class="ln">182  </span></a>												
+<a name="l183"><span class="ln">183  </span></a>						<span class="s1">cv2.rectangle(freeze_img, (x,y), (x+w,y+h), (</span><span class="s5">67</span><span class="s1">,</span><span class="s5">67</span><span class="s1">,</span><span class="s5">67</span><span class="s1">), </span><span class="s5">1</span><span class="s1">) </span><span class="s2">#draw rectangle to main image</span>
+<a name="l184"><span class="ln">184  </span></a>						
+<a name="l185"><span class="ln">185  </span></a>						<span class="s2">#-------------------------------</span>
+<a name="l186"><span class="ln">186  </span></a>						
+<a name="l187"><span class="ln">187  </span></a>						<span class="s2">#apply deep learning for custom_face</span>
+<a name="l188"><span class="ln">188  </span></a>						
+<a name="l189"><span class="ln">189  </span></a>						<span class="s1">custom_face = base_img[y:y+h, x:x+w]</span>
+<a name="l190"><span class="ln">190  </span></a>						
+<a name="l191"><span class="ln">191  </span></a>						<span class="s2">#-------------------------------</span>
+<a name="l192"><span class="ln">192  </span></a>						<span class="s2">#facial attribute analysis</span>
+<a name="l193"><span class="ln">193  </span></a>						
+<a name="l194"><span class="ln">194  </span></a>						<span class="s0">if </span><span class="s1">enable_face_analysis == </span><span class="s0">True</span><span class="s1">:</span>
+<a name="l195"><span class="ln">195  </span></a>							
+<a name="l196"><span class="ln">196  </span></a>							<span class="s1">gray_img = functions.preprocess_face(img = custom_face, target_size = (</span><span class="s5">48</span><span class="s1">, </span><span class="s5">48</span><span class="s1">), grayscale = </span><span class="s0">True</span><span class="s1">, enforce_detection = </span><span class="s0">False</span><span class="s1">)</span>
+<a name="l197"><span class="ln">197  </span></a>							<span class="s1">emotion_labels = [</span><span class="s3">'Angry'</span><span class="s1">, </span><span class="s3">'Disgust'</span><span class="s1">, </span><span class="s3">'Fear'</span><span class="s1">, </span><span class="s3">'Happy'</span><span class="s1">, </span><span class="s3">'Sad'</span><span class="s1">, </span><span class="s3">'Surprise'</span><span class="s1">, </span><span class="s3">'Neutral'</span><span class="s1">]</span>
+<a name="l198"><span class="ln">198  </span></a>							<span class="s1">emotion_predictions = emotion_model.predict(gray_img)[</span><span class="s5">0</span><span class="s1">,:]</span>
+<a name="l199"><span class="ln">199  </span></a>							<span class="s1">sum_of_predictions = emotion_predictions.sum()</span>
+<a name="l200"><span class="ln">200  </span></a>							
+<a name="l201"><span class="ln">201  </span></a>							<span class="s1">mood_items = []</span>
+<a name="l202"><span class="ln">202  </span></a>							<span class="s0">for </span><span class="s1">i </span><span class="s0">in </span><span class="s1">range(</span><span class="s5">0</span><span class="s1">, len(emotion_labels)):</span>
+<a name="l203"><span class="ln">203  </span></a>								<span class="s1">mood_item = []</span>
+<a name="l204"><span class="ln">204  </span></a>								<span class="s1">emotion_label = emotion_labels[i]</span>
+<a name="l205"><span class="ln">205  </span></a>								<span class="s1">emotion_prediction = </span><span class="s5">100 </span><span class="s1">* emotion_predictions[i] / sum_of_predictions</span>
+<a name="l206"><span class="ln">206  </span></a>								<span class="s1">mood_item.append(emotion_label)</span>
+<a name="l207"><span class="ln">207  </span></a>								<span class="s1">mood_item.append(emotion_prediction)</span>
+<a name="l208"><span class="ln">208  </span></a>								<span class="s1">mood_items.append(mood_item)</span>
+<a name="l209"><span class="ln">209  </span></a>							
+<a name="l210"><span class="ln">210  </span></a>							<span class="s1">emotion_df = pd.DataFrame(mood_items, columns = [</span><span class="s3">&quot;emotion&quot;</span><span class="s1">, </span><span class="s3">&quot;score&quot;</span><span class="s1">])</span>
+<a name="l211"><span class="ln">211  </span></a>							<span class="s1">emotion_df = emotion_df.sort_values(by = [</span><span class="s3">&quot;score&quot;</span><span class="s1">], ascending=</span><span class="s0">False</span><span class="s1">).reset_index(drop=</span><span class="s0">True</span><span class="s1">)</span>
+<a name="l212"><span class="ln">212  </span></a>							
+<a name="l213"><span class="ln">213  </span></a>							<span class="s2">#background of mood box</span>
+<a name="l214"><span class="ln">214  </span></a>							
+<a name="l215"><span class="ln">215  </span></a>							<span class="s2">#transparency</span>
+<a name="l216"><span class="ln">216  </span></a>							<span class="s1">overlay = freeze_img.copy()</span>
+<a name="l217"><span class="ln">217  </span></a>							<span class="s1">opacity = </span><span class="s5">0.1</span>
+<a name="l218"><span class="ln">218  </span></a>							
+<a name="l219"><span class="ln">219  </span></a>							<span class="s0">if </span><span class="s1">x+w+pivot_img_size &lt; resolution_x:</span>
+<a name="l220"><span class="ln">220  </span></a>								<span class="s2">#right</span>
+<a name="l221"><span class="ln">221  </span></a>								<span class="s1">cv2.rectangle(freeze_img</span>
+<a name="l222"><span class="ln">222  </span></a>									<span class="s2">#, (x+w,y+20)</span>
+<a name="l223"><span class="ln">223  </span></a>									<span class="s1">, (x+w,y)</span>
+<a name="l224"><span class="ln">224  </span></a>									<span class="s1">, (x+w+pivot_img_size, y+h)</span>
+<a name="l225"><span class="ln">225  </span></a>									<span class="s1">, (</span><span class="s5">208</span><span class="s1">,</span><span class="s5">189</span><span class="s1">,</span><span class="s5">0</span><span class="s1">),cv2.FILLED)</span><span class="s2">#TEAL</span>
+<a name="l226"><span class="ln">226  </span></a>
+<a name="l227"><span class="ln">227  </span></a>								<span class="s1">cv2.addWeighted(overlay, opacity, freeze_img, </span><span class="s5">1 </span><span class="s1">- opacity, </span><span class="s5">0</span><span class="s1">, freeze_img,)</span>
+<a name="l228"><span class="ln">228  </span></a>								
+<a name="l229"><span class="ln">229  </span></a>							<span class="s0">elif </span><span class="s1">x-pivot_img_size &gt; </span><span class="s5">0</span><span class="s1">:</span>
+<a name="l230"><span class="ln">230  </span></a>								<span class="s2">#left</span>
+<a name="l231"><span class="ln">231  </span></a>								<span class="s1">cv2.rectangle(freeze_img</span>
+<a name="l232"><span class="ln">232  </span></a>									<span class="s2">#, (x-pivot_img_size,y+20)</span>
+<a name="l233"><span class="ln">233  </span></a>									<span class="s1">, (x-pivot_img_size,y)</span>
+<a name="l234"><span class="ln">234  </span></a>									<span class="s1">, (x, y+h)</span>
+<a name="l235"><span class="ln">235  </span></a>									<span class="s1">, (</span><span class="s5">208</span><span class="s1">,</span><span class="s5">189</span><span class="s1">,</span><span class="s5">0</span><span class="s1">),cv2.FILLED)</span><span class="s2">#TEAL</span>
+<a name="l236"><span class="ln">236  </span></a>								
+<a name="l237"><span class="ln">237  </span></a>								<span class="s1">cv2.addWeighted(overlay, opacity, freeze_img, </span><span class="s5">1 </span><span class="s1">- opacity, </span><span class="s5">0</span><span class="s1">, freeze_img)</span>
+<a name="l238"><span class="ln">238  </span></a>							
+<a name="l239"><span class="ln">239  </span></a>							<span class="s0">for </span><span class="s1">index, instance </span><span class="s0">in </span><span class="s1">emotion_df.iterrows():</span>
+<a name="l240"><span class="ln">240  </span></a>								<span class="s1">emotion_label = </span><span class="s3">&quot;%s &quot; </span><span class="s1">% (instance[</span><span class="s3">'emotion'</span><span class="s1">])</span>
+<a name="l241"><span class="ln">241  </span></a>								<span class="s1">emotion_score = instance[</span><span class="s3">'score'</span><span class="s1">]/</span><span class="s5">100</span>
+<a name="l242"><span class="ln">242  </span></a>								
+<a name="l243"><span class="ln">243  </span></a>								<span class="s1">bar_x = </span><span class="s5">35 </span><span class="s2">#this is the size if an emotion is 100%</span>
+<a name="l244"><span class="ln">244  </span></a>								<span class="s1">bar_x = int(bar_x * emotion_score)</span>
+<a name="l245"><span class="ln">245  </span></a>
+<a name="l246"><span class="ln">246  </span></a>
+<a name="l247"><span class="ln">247  </span></a>								<span class="s0">if </span><span class="s1">x+w+pivot_img_size &lt; resolution_x:</span>
+<a name="l248"><span class="ln">248  </span></a>									
+<a name="l249"><span class="ln">249  </span></a>									<span class="s1">text_location_y = y + </span><span class="s5">20 </span><span class="s1">+ (index+</span><span class="s5">1</span><span class="s1">) * </span><span class="s5">20</span>
+<a name="l250"><span class="ln">250  </span></a>									<span class="s1">text_location_x = x+w</span>
+<a name="l251"><span class="ln">251  </span></a>									
+<a name="l252"><span class="ln">252  </span></a>									<span class="s0">if </span><span class="s1">text_location_y &lt; y + h:</span>
+<a name="l253"><span class="ln">253  </span></a>										<span class="s1">cv2.putText(freeze_img, emotion_label, (text_location_x, text_location_y), cv2.FONT_HERSHEY_SIMPLEX, </span><span class="s5">0.5</span><span class="s1">, (</span><span class="s5">255</span><span class="s1">, </span><span class="s5">255</span><span class="s1">, </span><span class="s5">255</span><span class="s1">), </span><span class="s5">1</span><span class="s1">)</span>
+<a name="l254"><span class="ln">254  </span></a>										
+<a name="l255"><span class="ln">255  </span></a>										<span class="s1">cv2.rectangle(freeze_img</span>
+<a name="l256"><span class="ln">256  </span></a>											<span class="s1">, (x+w+</span><span class="s5">70</span><span class="s1">, y + </span><span class="s5">13 </span><span class="s1">+ (index+</span><span class="s5">1</span><span class="s1">) * </span><span class="s5">20</span><span class="s1">)</span>
+<a name="l257"><span class="ln">257  </span></a>											<span class="s1">, (x+w+</span><span class="s5">70</span><span class="s1">+bar_x, y + </span><span class="s5">13 </span><span class="s1">+ (index+</span><span class="s5">1</span><span class="s1">) * </span><span class="s5">20 </span><span class="s1">+ </span><span class="s5">5</span><span class="s1">)</span>
+<a name="l258"><span class="ln">258  </span></a>											<span class="s1">, (</span><span class="s5">255</span><span class="s1">,</span><span class="s5">255</span><span class="s1">,</span><span class="s5">255</span><span class="s1">), cv2.FILLED)</span>
+<a name="l259"><span class="ln">259  </span></a>								
+<a name="l260"><span class="ln">260  </span></a>								<span class="s0">elif </span><span class="s1">x-pivot_img_size &gt; </span><span class="s5">0</span><span class="s1">:</span>
+<a name="l261"><span class="ln">261  </span></a>									
+<a name="l262"><span class="ln">262  </span></a>									<span class="s1">text_location_y = y + </span><span class="s5">20 </span><span class="s1">+ (index+</span><span class="s5">1</span><span class="s1">) * </span><span class="s5">20</span>
+<a name="l263"><span class="ln">263  </span></a>									<span class="s1">text_location_x = x-pivot_img_size</span>
+<a name="l264"><span class="ln">264  </span></a>									
+<a name="l265"><span class="ln">265  </span></a>									<span class="s0">if </span><span class="s1">text_location_y &lt;= y+h:</span>
+<a name="l266"><span class="ln">266  </span></a>										<span class="s1">cv2.putText(freeze_img, emotion_label, (text_location_x, text_location_y), cv2.FONT_HERSHEY_SIMPLEX, </span><span class="s5">0.5</span><span class="s1">, (</span><span class="s5">255</span><span class="s1">, </span><span class="s5">255</span><span class="s1">, </span><span class="s5">255</span><span class="s1">), </span><span class="s5">1</span><span class="s1">)</span>
+<a name="l267"><span class="ln">267  </span></a>										
+<a name="l268"><span class="ln">268  </span></a>										<span class="s1">cv2.rectangle(freeze_img</span>
+<a name="l269"><span class="ln">269  </span></a>											<span class="s1">, (x-pivot_img_size+</span><span class="s5">70</span><span class="s1">, y + </span><span class="s5">13 </span><span class="s1">+ (index+</span><span class="s5">1</span><span class="s1">) * </span><span class="s5">20</span><span class="s1">)</span>
+<a name="l270"><span class="ln">270  </span></a>											<span class="s1">, (x-pivot_img_size+</span><span class="s5">70</span><span class="s1">+bar_x, y + </span><span class="s5">13 </span><span class="s1">+ (index+</span><span class="s5">1</span><span class="s1">) * </span><span class="s5">20 </span><span class="s1">+ </span><span class="s5">5</span><span class="s1">)</span>
+<a name="l271"><span class="ln">271  </span></a>											<span class="s1">, (</span><span class="s5">255</span><span class="s1">,</span><span class="s5">255</span><span class="s1">,</span><span class="s5">255</span><span class="s1">), cv2.FILLED)</span>
+<a name="l272"><span class="ln">272  </span></a>
+<a name="l273"><span class="ln">273  </span></a>						<span class="s2">#-------------------------------</span>
+<a name="l274"><span class="ln">274  </span></a>
+<a name="l275"><span class="ln">275  </span></a>				<span class="s2"># time_left = int(time_threshold - (toc - tic) + 1)</span>
+<a name="l276"><span class="ln">276  </span></a>				<span class="s2"># countdown box</span>
+<a name="l277"><span class="ln">277  </span></a>				<span class="s2"># cv2.rectangle(freeze_img, (10, 10), (90, 50), (208,189,0), -10)</span>
+<a name="l278"><span class="ln">278  </span></a>				<span class="s2"># cv2.putText(freeze_img, str(time_left), (40, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)</span>
+<a name="l279"><span class="ln">279  </span></a>
+<a name="l280"><span class="ln">280  </span></a>				<span class="s1">cv2.imshow(</span><span class="s3">'Analysis Report'</span><span class="s1">, freeze_img)</span>
+<a name="l281"><span class="ln">281  </span></a>
+<a name="l282"><span class="ln">282  </span></a>				<span class="s1">freezed_frame = freezed_frame + </span><span class="s5">1</span>
+<a name="l283"><span class="ln">283  </span></a>			<span class="s0">else</span><span class="s1">:</span>
+<a name="l284"><span class="ln">284  </span></a>				<span class="s1">face_detected = </span><span class="s0">False</span>
+<a name="l285"><span class="ln">285  </span></a>				<span class="s1">face_included_frames = </span><span class="s5">0</span>
+<a name="l286"><span class="ln">286  </span></a>				<span class="s1">freeze = </span><span class="s0">False</span>
+<a name="l287"><span class="ln">287  </span></a>				<span class="s1">freezed_frame = </span><span class="s5">0</span>
+<a name="l288"><span class="ln">288  </span></a>
+<a name="l289"><span class="ln">289  </span></a>		<span class="s1">imgbytes = cv2.imencode(</span><span class="s3">'.png'</span><span class="s1">, captured_frame)[</span><span class="s5">1</span><span class="s1">].tobytes()  </span><span class="s2"># Have to add this and also chnage parrameter</span>
+<a name="l290"><span class="ln">290  </span></a>		<span class="s2"># ---------------------------- THE GUI ----------------------------</span>
+<a name="l291"><span class="ln">291  </span></a>		<span class="s1">sg.theme(</span><span class="s3">'Reddit'</span><span class="s1">)</span>
+<a name="l292"><span class="ln">292  </span></a>		<span class="s0">if not </span><span class="s1">win_started:</span>
+<a name="l293"><span class="ln">293  </span></a>			<span class="s1">win_started = </span><span class="s0">True</span>
+<a name="l294"><span class="ln">294  </span></a>			<span class="s1">layout = [</span>
+<a name="l295"><span class="ln">295  </span></a>				<span class="s1">[sg.Text(</span><span class="s3">'Facial Analysis in Progress'</span><span class="s1">, size=(</span><span class="s5">30</span><span class="s1">, </span><span class="s5">1</span><span class="s1">))],</span>
+<a name="l296"><span class="ln">296  </span></a>				<span class="s1">[sg.Image(data=imgbytes, key=</span><span class="s3">'_IMAGE_'</span><span class="s1">)],  </span><span class="s2"># THIS IS THE ACTUAL CV FEED WINDOW</span>
+<a name="l297"><span class="ln">297  </span></a>				<span class="s1">[sg.Button(</span><span class="s3">'Stop'</span><span class="s1">)]</span>
+<a name="l298"><span class="ln">298  </span></a>			<span class="s1">]</span>
+<a name="l299"><span class="ln">299  </span></a>			<span class="s1">window = sg.Window(</span><span class="s3">'Emotion Detection'</span><span class="s1">, layout, default_element_size=(</span><span class="s5">14</span><span class="s1">, </span><span class="s5">1</span><span class="s1">),</span>
+<a name="l300"><span class="ln">300  </span></a>							   <span class="s1">text_justification=</span><span class="s3">'left'</span><span class="s1">,</span>
+<a name="l301"><span class="ln">301  </span></a>							   <span class="s1">auto_size_text=</span><span class="s0">False</span><span class="s1">, font=</span><span class="s3">'helvetica'</span><span class="s1">,icon=icon_logo64,finalize=</span><span class="s0">True</span><span class="s1">)</span>
+<a name="l302"><span class="ln">302  </span></a>
+<a name="l303"><span class="ln">303  </span></a>			<span class="s1">image_elem = window[</span><span class="s3">'_IMAGE_'</span><span class="s1">]</span>
+<a name="l304"><span class="ln">304  </span></a>		<span class="s0">else</span><span class="s1">:</span>
+<a name="l305"><span class="ln">305  </span></a>			<span class="s1">image_elem.update(data=imgbytes)</span>
+<a name="l306"><span class="ln">306  </span></a>
+<a name="l307"><span class="ln">307  </span></a>		<span class="s1">event, values = window.read(timeout=</span><span class="s5">0</span><span class="s1">)</span>
+<a name="l308"><span class="ln">308  </span></a>		<span class="s0">if </span><span class="s1">event </span><span class="s0">is None or </span><span class="s1">event == </span><span class="s3">'Stop'</span><span class="s1">:</span>
+<a name="l309"><span class="ln">309  </span></a>			<span class="s0">break</span>
+<a name="l310"><span class="ln">310  </span></a>	<span class="s1">window.close()</span>
+<a name="l311"><span class="ln">311  </span></a>
+<a name="l312"><span class="ln">312  </span></a>	<span class="s2">#kill open cv things</span>
+<a name="l313"><span class="ln">313  </span></a>	<span class="s1">captured_video.release()</span>
+<a name="l314"><span class="ln">314  </span></a>	<span class="s1">cv2.destroyAllWindows()</span>
+<a name="l315"><span class="ln">315  </span></a>
+<a name="l316"><span class="ln">316  </span></a></pre>
+</body>
+</html>

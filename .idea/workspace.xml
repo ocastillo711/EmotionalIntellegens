@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="7d7945de-55f3-4330-90ce-d4a90cb294fd" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExportToHTMLSettings">
+    <option name="printScope" value="4" />
+    <option name="PRINT_LINE_NUMBERS" value="true" />
+    <option name="OPEN_IN_BROWSER" value="true" />
+    <option name="OUTPUT_DIRECTORY" value="$PROJECT_DIR$/exportToHTML" />
+  </component>
+  <component name="FlaskConsoleOptions" custom-start-script="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))">
+    <envs>
+      <env key="FLASK_APP" value="app" />
+    </envs>
+    <option name="myCustomStartScript" value="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))" />
+    <option name="myEnvs">
+      <map>
+        <entry key="FLASK_APP" value="app" />
+      </map>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1rXqVmSypKTbgW6Q3Gw9zVtMXzh" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="Python" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\odb88\PycharmProjects\EmotionalIntellegens" />
+      <recent name="C:\Users\odb88\PycharmProjects\EmotionalIntellegens\deepface" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\odb88\PycharmProjects\EmotionalIntellegens\Graphics" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="EmotionalIntellegens" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="EmotionalIntellegens" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/EmotionalIntellegens.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.EmotionalIntellegens" />
+        <item itemvalue="Python.EmotionalIntellegens" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7d7945de-55f3-4330-90ce-d4a90cb294fd" name="Default Changelist" comment="" />
+      <created>1619132810165</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1619132810165</updated>
+      <workItem from="1619132811991" duration="3293000" />
+      <workItem from="1619136153020" duration="385000" />
+      <workItem from="1619136707665" duration="852000" />
+      <workItem from="1619280849002" duration="1768000" />
+      <workItem from="1619287138623" duration="13406000" />
+      <workItem from="1619470340330" duration="7451000" />
+      <workItem from="1619654563966" duration="139000" />
+      <workItem from="1619719563288" duration="1838000" />
+      <workItem from="1619730124279" duration="5000" />
+      <workItem from="1619730135519" duration="38000" />
+      <workItem from="1619814699750" duration="624000" />
+      <workItem from="1619911169537" duration="1044000" />
+      <workItem from="1620076417681" duration="2256000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/EmotionalIntellegens$EmotionalIntellegens__1_.coverage" NAME="EmotionalIntellegens Coverage Results" MODIFIED="1619134524990" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/EmotionalIntellegens$EmotionalIntellegens.coverage" NAME="EmotionalIntellegens Coverage Results" MODIFIED="1620078142293" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+  </component>
+</project>
